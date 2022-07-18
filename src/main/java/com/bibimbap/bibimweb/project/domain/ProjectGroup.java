@@ -1,5 +1,6 @@
 package com.bibimbap.bibimweb.project.domain;
 
+import com.bibimbap.bibimweb.member.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,5 +31,5 @@ public class ProjectGroup {
             joinColumns = @JoinColumn(name = "PROJECT_GROUP_ID"),
             inverseJoinColumns = @JoinColumn(name = "MEMBER_ID")
     )
-    private List<ProjectMember> members;
+    private List<Member> members;
 }
