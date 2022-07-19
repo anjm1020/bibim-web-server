@@ -28,13 +28,12 @@
 
 | name       | type   | required | description |
 | ---------- | ------ | -------- | ----------- |
-| pageNumber | Number | True     | 페이지네이션 오프셋 |
+| pageNumber | Number | True     | 페이지네이션 오프셋 |
 | pageSize   | Number | True     | 페이지 사이즈     |
 
 **RESPONSE**
 
 ```json
-// 200 OK
 [
     {
     "id": "Number",
@@ -60,7 +59,6 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
     "id": "Long",
     "name" : "String",
@@ -77,7 +75,6 @@
 **Request Body** 
 
 ```json
-// content-type : json
 {
     "name" : "String",
     "attendance": "String(boolean 배열 01배열로 변환하여 저장)"
@@ -87,7 +84,6 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
     "id": "Number",
     "name" : "String",
@@ -104,9 +100,8 @@
 **Request Body**
 
 ```json
-// content-type : json
 {
-    "id": "Number",
+    "id" : "Number",
     "name" : "String",
     "attendance": "String(boolean 배열 01배열로 변환하여 저장)"
 }
@@ -115,9 +110,8 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
-    "id": "Number",
+    "id" : "Number",
     "name" : "String",
     "attendance": "String(boolean 배열 01배열로 변환하여 저장)"
 }
@@ -138,7 +132,6 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
 }
 ```
