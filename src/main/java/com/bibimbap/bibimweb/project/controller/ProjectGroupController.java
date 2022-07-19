@@ -3,6 +3,7 @@ package com.bibimbap.bibimweb.project.controller;
 import com.bibimbap.bibimweb.project.domain.ProjectGroup;
 import com.bibimbap.bibimweb.project.repository.ProjectGroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,8 +16,8 @@ public class ProjectGroupController {
     private final ProjectGroupRepository projectGroupRepository;
 
     @GetMapping("/")
-    public List<ProjectGroup> getListGroup() {
-        return projectGroupRepository.findAll();
+    public List<ProjectGroup> getGroupList(Pageable pageable) {
+        return projectGroupRepository.findAll(pageable).getContent();
     }
 
     @GetMapping("/{id}")

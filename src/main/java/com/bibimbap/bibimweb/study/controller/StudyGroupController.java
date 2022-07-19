@@ -3,6 +3,7 @@ package com.bibimbap.bibimweb.study.controller;
 import com.bibimbap.bibimweb.study.domain.StudyGroup;
 import com.bibimbap.bibimweb.study.repository.StudyGroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
@@ -16,8 +17,8 @@ public class StudyGroupController {
     private final StudyGroupRepository studyGroupRepository;
 
     @GetMapping("/")
-    public List<StudyGroup> getGroupList() {
-        return studyGroupRepository.findAll();
+    public List<StudyGroup> getGroupList(Pageable pageable) {
+        return studyGroupRepository.findAll(pageable).getContent();
     }
 
     @GetMapping("/{id}")

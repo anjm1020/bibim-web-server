@@ -25,6 +25,9 @@ public class ProjectGroup {
     @Column
     private String leaderName;
 
+    @Column
+    private String content;
+
     @OneToMany
     @JoinTable(
             name = "project_group_member",
