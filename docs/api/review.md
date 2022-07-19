@@ -29,13 +29,12 @@
 
 | name       | type   | required | description |
 | ---------- | ------ | -------- | ----------- |
-| pageNumber | Number | True     | 페이지네이션 오프셋 |
+| pageNumber | Number | True     | 페이지네이션 오프셋 |
 | pageSize   | Number | True     | 페이지 사이즈     |
 
 **RESPONSE**
 
 ```json
-// 200 OK
 [
     {
     "id" : "Number",
@@ -43,7 +42,7 @@
     "comment" : "String(팀 이름)",
     "lecture" : "String(스터디,프로젝트 구분/id ex)STUDY/3 )",
     },
-    {
+    {
     "id" : "Number",
     "author_name" : "Number(년도)",
     "comment" : "String(팀 이름)",
@@ -67,7 +66,6 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
     "id" : "Number",
     "author_name" : "Number(년도)",
@@ -85,7 +83,6 @@
 **Request Body**
 
 ```json
-// content-type : json
 {
     "author_name" : "Number(년도)",
     "comment" : "String(팀 이름)",
@@ -96,7 +93,6 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
     "id" : "Number",
     "author_name" : "Number(년도)",
@@ -114,7 +110,6 @@
 **Request Body**
 
 ```json
-// content-type : json
 {
     "id" : "Number",
     "author_name" : "Number(년도)",
@@ -126,7 +121,6 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
     "id" : "Number",
     "author_name" : "Number(년도)",
@@ -150,7 +144,6 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
 }
 ```
