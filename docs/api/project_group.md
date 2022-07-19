@@ -48,20 +48,20 @@
 
 | name       | type   | required | description |
 | ---------- | ------ | -------- | ----------- |
-| pageNumber | Number | True     | 페이지네이션 오프셋 |
+| pageNumber | Number | True     | 페이지네이션 오프셋 |
 | pageSize   | Number | True     | 페이지 사이즈     |
 
 **RESPONSE**
 
 ```json
-// 200 OK
+{
 [
     {
     "id" : "Number",
     "period" : "Number(년도)",
     "teamName" : "String(팀 이름)",                
     "leaderName" : "String(팀장 이름)",
-    "content" : "String(본문)"
+    "content" : "String(본문)",
     "members" : 
         [
             {
@@ -81,12 +81,12 @@
             },
         ]
     },
-    {
+    {
     "id" : "Number",
     "period" : "Number(년도)",
     "teamName" : "String(팀 이름)",                
     "leaderName" : "String(팀장 이름)",
-    "content" : "String(본문)"
+    "content" : "String(본문)",
     "members" : 
         [
             {
@@ -105,8 +105,9 @@
                 "attendance": "String(boolean 배열 01배열로 변환하여 저장)"
             },
         ]
-    }
+    }
 ]
+}
 ```
 
 ##### getProjectGroupById
@@ -124,7 +125,6 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
     "id" : "Number",
     "period" : "Number(년도)",
@@ -161,12 +161,11 @@
 **Request Body**
 
 ```json
-// content-type : json
 {
     "period" : "Number",
     "teamName" : "String",
     "leaderName" : "String",
-    "content" : "String(본문)"
+    "content" : "String(본문)",
     "members" : 
         [
             "Number(member 고유 id)",
@@ -177,13 +176,12 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
     "id" : "Number",
     "period" : "Number(년도)",
     "teamName" : "String(팀 이름)",                
     "leaderName" : "String(팀장 이름)",
-    "content" : "String(본문)"
+    "content" : "String(본문)",
     "members" : 
         [
             {
@@ -214,7 +212,6 @@
 **Request Body**
 
 ```json
-// content-type : json
 {
     "id" : "Number",
     "period" : "Number",
@@ -231,7 +228,6 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
     "id": "Number",
     "name" : "String",
@@ -254,7 +250,6 @@
 **RESPONSE**
 
 ```json
-// 200 OK
 {
 }
 ```
