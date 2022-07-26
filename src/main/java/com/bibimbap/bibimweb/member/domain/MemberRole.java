@@ -6,21 +6,18 @@ import javax.persistence.*;
 
 @Entity @Builder
 @Getter @Setter @ToString
-@NoArgsConstructor @AllArgsConstructor
-public class Member {
+@AllArgsConstructor @NoArgsConstructor
+public class MemberRole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String studentId;
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    @Column
-    private String name;
-
-    @Column
-    @Builder.Default
-    private String attendance = "";
-
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 }

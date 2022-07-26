@@ -4,23 +4,19 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Entity @Builder
-@Getter @Setter @ToString
+@Entity
+@Getter @Setter @ToString @Builder
 @NoArgsConstructor @AllArgsConstructor
-public class Member {
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private String studentId;
+    private String groupName;
 
     @Column
-    private String name;
-
-    @Column
-    @Builder.Default
-    private String attendance = "";
+    private String role;
 
 }
