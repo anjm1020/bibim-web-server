@@ -10,6 +10,8 @@ import com.bibimbap.bibimweb.util.exception.OutOfRangeException;
 import com.bibimbap.bibimweb.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +31,7 @@ public class MemberController {
         }
         return memberService.createMember(member);
     }
+
 
     @GetMapping(value = "/")
     public List<MemberResponseDto> getMemberList(Pageable pageable) {
@@ -63,10 +66,11 @@ public class MemberController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteMemberById(@PathVariable Long id) {
+    public ResponseEntity deleteMemberById(@PathVariable Long id) {
         if (!memberService.isExistMember(id)) {
             throw NotFoundException.MEMBER;
         }
         memberService.deleteMember(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
