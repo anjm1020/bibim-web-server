@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -61,11 +60,13 @@ class MemberControllerTest {
 
     private ModelMapper mapper = new ModelMapper();
 
-    Member addMember() throws Exception {
-        Member member = new Member();
-        member.setAttendance("000");
-        member.setName("test");
-        String content = objectMapper.writeValueAsString(member);
+    Member addMember(String name, String studentId) throws Exception {
+        MemberCreateDto dto = MemberCreateDto.builder()
+                .name(name)
+                .studentId(studentId)
+                .build();
+
+        String content = objectMapper.writeValueAsString(dto);
         MvcResult mvcResult = mockMvc.perform(post("/members/")
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -85,8 +86,12 @@ class MemberControllerTest {
     @DisplayName("멤버 리스트 테스트")
     void getMemberList() throws Exception {
 
-        addMember();
-        addMember();
+        addMember("member1", "111");
+        addMember("member2", "222");
+        addMember("member3", "333");
+        addMember("member4", "444");
+        addMember("member5", "555");
+        addMember("member6", "666");
 
         mockMvc.perform(get("/members/")
                         .queryParam("page", "0")
@@ -96,8 +101,8 @@ class MemberControllerTest {
 
         // page exception
         mockMvc.perform(get("/members/")
-                        .queryParam("page", "20")
-                        .queryParam("size", "5"))
+                        .queryParam("page", "1")
+                        .queryParam("size", "7"))
                 .andExpect(
                         result -> Assertions.assertTrue(result.getResolvedException().getClass()
                                 .isAssignableFrom(OutOfRangeException.class))
@@ -128,7 +133,7 @@ class MemberControllerTest {
     @Test
     @DisplayName("단일 멤버 조회 테스트")
     void getMemberById() throws Exception {
-        Member member = addMember();
+        Member member = addMember("member1","111");
         Long id = member.getId();
         mockMvc.perform(get("/members/" + id))
                 .andExpect(status().isOk())
@@ -163,7 +168,7 @@ class MemberControllerTest {
     @Test
     @DisplayName("멤버 수정 테스트")
     void updateMember() throws Exception {
-        Member member = addMember();
+        Member member = addMember("member1", "111");
         member.setName("UpdateMember");
         RoleUpdateDto roleDto = RoleUpdateDto.builder()
                 .groupName("testGroup")
@@ -193,10 +198,10 @@ class MemberControllerTest {
     @Test
     @DisplayName("멤버 삭제 테스트")
     void deleteMemberById() throws Exception {
-        Member member = addMember();
+        Member member = addMember("member1", "111");
         Long id = member.getId();
         mockMvc.perform(delete("/members/" + id))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andDo(MockMvcResultHandlers.print());
     }
 
@@ -408,7 +413,7 @@ class MemberControllerTest {
             System.out.println(memberRole);
         }
         mockMvc.perform(delete("/members/3"))
-//                .andExpect(status().isOk())
+                .andExpect(status().isNotFound())
                 .andDo(MockMvcResultHandlers.print());
         List<MemberRole> all = memberRoleRepository.findAll();
         for (MemberRole memberRole : all) {
