@@ -14,6 +14,12 @@ public class Role {
     private Long id;
 
     @Column
+    private String groupType;
+
+    @Column
+    private Long groupId;
+
+    @Column
     private String groupName;
 
     @Column
