@@ -1,15 +1,14 @@
 package com.bibimbap.bibimweb.project.domain;
 
 import com.bibimbap.bibimweb.member.domain.Member;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Getter @Setter @NoArgsConstructor
+@Entity @Builder @ToString
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class ProjectGroup {
 
     @Id
@@ -17,13 +16,14 @@ public class ProjectGroup {
     private Long id;
 
     @Column
-    private Integer period;
+    private String period;
 
     @Column
     private String teamName;
 
-    @Column
-    private String leaderName;
+    @ManyToOne
+    @JoinColumn
+    private Member leader;
 
     @Column
     private String content;
@@ -34,5 +34,6 @@ public class ProjectGroup {
             joinColumns = @JoinColumn(name = "PROJECT_GROUP_ID"),
             inverseJoinColumns = @JoinColumn(name = "MEMBER_ID")
     )
-    private List<Member> members;
+    @Builder.Default
+    private List<Member> members = new ArrayList<>();
 }
