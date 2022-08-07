@@ -13,10 +13,9 @@ import java.util.List;
 public class ProjectTeamCreateDto {
     private String groupName;
     private Long leaderId;
-    private String period;
 
     private String content;
 
     @Builder.Default
-    private List<Long> memberList = new ArrayList<>();
+    private List<Long> members = new ArrayList<>();
 }

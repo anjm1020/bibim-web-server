@@ -1,17 +1,14 @@
 package com.bibimbap.bibimweb.domain.team;
 
 import com.bibimbap.bibimweb.domain.member.Member;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Getter @Setter @SuperBuilder
+@Getter @Setter @SuperBuilder @ToString
 @AllArgsConstructor @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn
