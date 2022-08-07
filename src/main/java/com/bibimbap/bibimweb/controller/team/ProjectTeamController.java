@@ -22,7 +22,7 @@ public class ProjectTeamController {
     private final ProjectTeamService projectTeamService;
 
     @PostMapping("/")
-    public ProjectTeamResponseDto createProjectTeam(ProjectTeamCreateDto dto) {
+    public ProjectTeamResponseDto createProjectTeam(@RequestBody ProjectTeamCreateDto dto) {
         return projectTeamService.createProjectTeam(dto);
     }
 
@@ -43,7 +43,7 @@ public class ProjectTeamController {
     }
 
     @PutMapping("/")
-    public ProjectTeamResponseDto updateProjectTeam(ProjectTeamUpdateDto dto) {
+    public ProjectTeamResponseDto updateProjectTeam(@RequestBody ProjectTeamUpdateDto dto) {
         if (!projectTeamService.isExistTeam(dto.getId())) {
             throw NotFoundException.PROJECT_GROUP;
         }

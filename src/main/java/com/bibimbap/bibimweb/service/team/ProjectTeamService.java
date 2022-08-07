@@ -43,16 +43,31 @@ public class ProjectTeamService {
     }
 
     public ProjectTeamResponseDto createProjectTeam(ProjectTeamCreateDto dto) {
+        Member leader = memberRepository.findById(dto.getLeaderId()).get();
         ProjectTeam newTeam = ProjectTeam.builder()
                 .groupName(dto.getGroupName())
-                .leader(memberRepository.findById(dto.getLeaderId()).get())
+                .leader(leader)
                 .content(dto.getContent())
                 .build();
+
         newTeam.setPeriod(String.valueOf(LocalDate.now().getYear()));
         newTeam.setMembers(dto.getMembers().stream()
-                .map(o->memberRepository.findById(o).get())
+                .map(o -> memberRepository.findById(o).get())
                 .collect(Collectors.toList()));
-        return mapper.map(projectTeamRepository.save(newTeam), ProjectTeamResponseDto.class);
+        ProjectTeam saved = projectTeamRepository.save(newTeam);
+
+        projectRoleRepository.save(ProjectRole.builder()
+                .team(saved)
+                .member(leader)
+                .rollName("LEADER")
+                .build());
+        saved.getMembers().stream()
+                .forEach(m -> projectRoleRepository.save(ProjectRole.builder()
+                        .team(saved)
+                        .member(m)
+                        .rollName("MEMBER")
+                        .build()));
+        return mapper.map(saved, ProjectTeamResponseDto.class);
     }
 
     public List<ProjectTeamResponseDto> getProjectTeamList(Pageable pageable) {
@@ -73,11 +88,11 @@ public class ProjectTeamService {
         // leader mapping
         Member leader = memberRepository.findById(dto.getLeaderId()).get();
         projectTeam.setLeader(leader);
-        Optional<ProjectRole> leaderRole = projectRoleRepository.findByProjectTeamAndRollName(dto.getId(), "LEADER");
+        Optional<ProjectRole> leaderRole = projectRoleRepository.findByTeamIdAndRollName(dto.getId(), "LEADER");
         ProjectRole savedLeaderRole;
         if (leaderRole.isEmpty()) {
-             savedLeaderRole = projectRoleRepository.save(ProjectRole.builder()
-                    .projectTeam(projectTeam)
+            savedLeaderRole = projectRoleRepository.save(ProjectRole.builder()
+                    .team(projectTeam)
                     .member(leader)
                     .rollName("LEADER")
                     .build());
@@ -96,13 +111,13 @@ public class ProjectTeamService {
         List<Long> members = dto.getMembers();
         for (Long id : members) {
             Member curr = memberRepository.findById(id).get();
-            Optional<ProjectRole> memberRole = projectRoleRepository.findByProjectTeamAndRollNameAndMember(dto.getId(), "MEMBER", id);
+            Optional<ProjectRole> memberRole = projectRoleRepository.findByTeamIdAndRollNameAndMemberId(dto.getId(), "MEMBER", id);
             ProjectRole savedMemberRole;
             if (memberRole.isEmpty()) {
                 // 신규 멤버
                 savedMemberRole = projectRoleRepository.save(ProjectRole.builder()
-                        .projectTeam(projectTeam)
-                        .member(leader)
+                        .team(projectTeam)
+                        .member(curr)
                         .rollName("MEMBER")
                         .build());
                 roles = curr.getRoles();
@@ -115,7 +130,7 @@ public class ProjectTeamService {
         projectTeam.setMembers(newMembers);
 
         // find member to delete
-        List<ProjectRole> teamMembers = projectRoleRepository.findAllByProjectTeamAndRollName(dto.getId(), "MEMBER");
+        List<ProjectRole> teamMembers = projectRoleRepository.findAllByTeamIdAndRollName(dto.getId(), "MEMBER");
         for (ProjectRole m : teamMembers) {
             Optional<Long> found = members.stream()
                     .filter(o -> m.getId() == o)

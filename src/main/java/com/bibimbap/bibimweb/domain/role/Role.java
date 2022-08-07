@@ -1,6 +1,7 @@
 package com.bibimbap.bibimweb.domain.role;
 
 import com.bibimbap.bibimweb.domain.member.Member;
+import com.bibimbap.bibimweb.domain.team.Team;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -18,6 +19,10 @@ public class Role  {
     private Long id;
 
     private String rollName;
+
+    @ManyToOne
+    @JoinColumn
+    private Team team;
 
     @ManyToOne
     @JoinColumn

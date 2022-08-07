@@ -9,16 +9,17 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectTeamResponseDto {
     private Long id;
     private String groupName;
-    private MemberResponseDto leaderId;
+    private MemberResponseDto leader;
     private String period;
 
     private String content;
 
     @Builder.Default
-    private List<MemberResponseDto> memberId = new ArrayList<>();
+    private List<MemberResponseDto> members = new ArrayList<>();
 }

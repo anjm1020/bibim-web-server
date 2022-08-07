@@ -14,10 +14,9 @@ public class ProjectTeamUpdateDto {
     private Long id;
     private String groupName;
     private Long leaderId;
-    private String period;
 
     private String content;
 
     @Builder.Default
-    private List<Long> memberId = new ArrayList<>();
+    private List<Long> members = new ArrayList<>();
 }
