@@ -8,8 +8,8 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberResponseDto {
+public class MemberDto {
     private Long id;
     private String name;
-
+    private String studentId;
 }

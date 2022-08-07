@@ -12,4 +12,5 @@ import javax.persistence.Entity;
 @DiscriminatorValue("byAdmin")
 public class AdminMember extends Member {
     private String position;
+    private Long period;
 }
