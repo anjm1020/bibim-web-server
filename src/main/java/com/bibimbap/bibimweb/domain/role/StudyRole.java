@@ -21,8 +21,6 @@ import javax.persistence.ManyToOne;
 @DiscriminatorValue("byStudy")
 public class StudyRole extends Role {
 
-    @ManyToOne
-    @JoinColumn
-    private StudyTeam studyGroup;
 
+    private Integer groupNumber;
 }
