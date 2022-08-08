@@ -1,10 +1,12 @@
 package com.bibimbap.bibimweb.domain.team;
 
 import com.bibimbap.bibimweb.domain.member.Member;
+import com.bibimbap.bibimweb.domain.team.tag.TeamTag;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,4 +31,8 @@ public class Team {
     @OneToMany
     @JoinColumn
     private List<Member> members;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "team")
+    private List<TeamTag> tags = new ArrayList<>();
 }

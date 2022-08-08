@@ -19,4 +19,6 @@ public class ProjectTeamUpdateDto {
 
     @Builder.Default
     private List<Long> members = new ArrayList<>();
+    @Builder.Default
+    private List<String> tags = new ArrayList<>();
 }
