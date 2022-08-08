@@ -29,6 +29,7 @@ public class ProjectTeamService {
     private final MemberRepository memberRepository;
     private final ProjectRoleRepository projectRoleRepository;
 
+    private final TagService tagService;
     private final ModelMapper mapper = new ModelMapper();
 
     public boolean isValidPage(Pageable pageable) {
@@ -44,6 +45,7 @@ public class ProjectTeamService {
 
     public ProjectTeamResponseDto createProjectTeam(ProjectTeamCreateDto dto) {
         Member leader = memberRepository.findById(dto.getLeaderId()).get();
+
         ProjectTeam newTeam = ProjectTeam.builder()
                 .groupName(dto.getGroupName())
                 .leader(leader)
@@ -56,17 +58,25 @@ public class ProjectTeamService {
                 .collect(Collectors.toList()));
         ProjectTeam saved = projectTeamRepository.save(newTeam);
 
-        projectRoleRepository.save(ProjectRole.builder()
+        // project Role setting
+        ProjectRole leaderRole = projectRoleRepository.save(ProjectRole.builder()
                 .team(saved)
                 .member(leader)
                 .rollName("LEADER")
                 .build());
+        leader.getRoles().add(leaderRole);
+
         saved.getMembers().stream()
-                .forEach(m -> projectRoleRepository.save(ProjectRole.builder()
-                        .team(saved)
-                        .member(m)
-                        .rollName("MEMBER")
-                        .build()));
+                .forEach(m -> {
+                    ProjectRole memberRole = projectRoleRepository.save(ProjectRole.builder()
+                            .team(saved)
+                            .member(m)
+                            .rollName("MEMBER")
+                            .build());
+                    m.getRoles().add(memberRole);
+                });
+        // Tag Setting
+        tagService.saveTags(saved.getId(), dto.getTags());
         return mapper.map(saved, ProjectTeamResponseDto.class);
     }
 
@@ -139,8 +149,12 @@ public class ProjectTeamService {
                 projectRoleRepository.deleteById(m.getId());
             }
         }
+
+        // tag update
+        tagService.updateTags(projectTeam.getId(), dto.getTags());
         ProjectTeam saved = projectTeamRepository.save(projectTeam);
-        return mapper.map(saved, ProjectTeamResponseDto.class);
+        ProjectTeamResponseDto res = mapper.map(saved, ProjectTeamResponseDto.class);
+        return res;
     }
 
     public void deleteProjectTeam(Long teamId) {
