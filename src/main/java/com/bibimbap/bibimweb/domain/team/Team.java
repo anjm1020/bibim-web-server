@@ -1,6 +1,7 @@
 package com.bibimbap.bibimweb.domain.team;
 
 import com.bibimbap.bibimweb.domain.member.Member;
+import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.domain.team.tag.TeamTag;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -28,9 +29,9 @@ public class Team {
 
     private String period;
 
-    @OneToMany
-    @JoinColumn
-    private List<Member> members;
+    @Builder.Default
+    @OneToMany(mappedBy = "team")
+    private List<Role> roles = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "team")

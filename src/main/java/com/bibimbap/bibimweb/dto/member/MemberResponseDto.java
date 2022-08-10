@@ -11,5 +11,4 @@ import lombok.*;
 public class MemberResponseDto {
     private Long id;
     private String name;
-
 }

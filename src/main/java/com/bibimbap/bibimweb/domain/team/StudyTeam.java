@@ -19,6 +19,6 @@ import java.util.List;
 public class StudyTeam extends Team {
 
     @OneToMany
-    @JoinColumn
+    @JoinColumn(name = "teamId")
     private List<StudyDetail> details;
 }

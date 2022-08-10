@@ -4,6 +4,7 @@ import com.bibimbap.bibimweb.domain.member.Member;
 import com.bibimbap.bibimweb.domain.role.ProjectRole;
 import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.domain.team.ProjectTeam;
+import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamCreateDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamResponseDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamUpdateDto;
@@ -53,9 +54,6 @@ public class ProjectTeamService {
                 .build();
 
         newTeam.setPeriod(String.valueOf(LocalDate.now().getYear()));
-        newTeam.setMembers(dto.getMembers().stream()
-                .map(o -> memberRepository.findById(o).get())
-                .collect(Collectors.toList()));
         ProjectTeam saved = projectTeamRepository.save(newTeam);
 
         // project Role setting
@@ -66,28 +64,30 @@ public class ProjectTeamService {
                 .build());
         leader.getRoles().add(leaderRole);
 
-        saved.getMembers().stream()
-                .forEach(m -> {
-                    ProjectRole memberRole = projectRoleRepository.save(ProjectRole.builder()
-                            .team(saved)
-                            .member(m)
-                            .rollName("MEMBER")
-                            .build());
-                    m.getRoles().add(memberRole);
-                });
+        // 멤버 리스트 잡고 저장해주기
+        for (Long memberId : dto.getMembers()) {
+            Member member = memberRepository.findById(memberId).get();
+            ProjectRole memberRole = projectRoleRepository.save(ProjectRole.builder()
+                    .team(saved)
+                    .member(member)
+                    .rollName("MEMBER")
+                    .build());
+            member.getRoles().add(memberRole);
+            saved.getRoles().add(memberRole);
+        }
         // Tag Setting
         tagService.saveTags(saved.getId(), dto.getTags());
-        return mapper.map(saved, ProjectTeamResponseDto.class);
+        return makeResponseDto(saved);
     }
 
     public List<ProjectTeamResponseDto> getProjectTeamList(Pageable pageable) {
         return projectTeamRepository.findAll(pageable).stream()
-                .map(o -> mapper.map(o, ProjectTeamResponseDto.class))
+                .map(o -> makeResponseDto(o))
                 .collect(Collectors.toList());
     }
 
     public ProjectTeamResponseDto getProjectTeamById(Long teamId) {
-        return mapper.map(projectTeamRepository.findById(teamId).get(), ProjectTeamResponseDto.class);
+        return makeResponseDto(projectTeamRepository.findById(teamId).get());
     }
 
     public ProjectTeamResponseDto updateProjectTeam(ProjectTeamUpdateDto dto) {
@@ -106,18 +106,17 @@ public class ProjectTeamService {
                     .member(leader)
                     .rollName("LEADER")
                     .build());
+            leader.getRoles().add(savedLeaderRole);
         } else {
             ProjectRole projectRole = leaderRole.get();
+            projectRole.getMember().getRoles().remove(projectRole);
             projectRole.setMember(leader);
             savedLeaderRole = projectRoleRepository.save(projectRole);
+            leader.getRoles().add(savedLeaderRole);
         }
-        List<Role> roles = leader.getRoles();
-        roles.add(savedLeaderRole);
-        leader.setRoles(roles);
         memberRepository.save(leader);
 
         // member mapping
-        List<Member> newMembers = new ArrayList<>();
         List<Long> members = dto.getMembers();
         for (Long id : members) {
             Member curr = memberRepository.findById(id).get();
@@ -130,35 +129,40 @@ public class ProjectTeamService {
                         .member(curr)
                         .rollName("MEMBER")
                         .build());
-                roles = curr.getRoles();
-                roles.add(savedMemberRole);
-                curr.setRoles(roles);
+                curr.getRoles().add(savedMemberRole);
+                projectTeam.getRoles().add(savedMemberRole);
                 memberRepository.save(curr);
             }
-            newMembers.add(curr);
         }
-        projectTeam.setMembers(newMembers);
 
         // find member to delete
         List<ProjectRole> teamMembers = projectRoleRepository.findAllByTeamIdAndRollName(dto.getId(), "MEMBER");
-        for (ProjectRole m : teamMembers) {
+        for (ProjectRole pr : teamMembers) {
             Optional<Long> found = members.stream()
-                    .filter(o -> m.getId() == o)
+                    .filter(o -> pr.getId() == o)
                     .findAny();
             if (found.isEmpty()) {
-                projectRoleRepository.deleteById(m.getId());
+                projectRoleRepository.deleteById(pr.getId());
+                pr.getMember().getRoles().remove(pr);
             }
         }
 
         // tag update
         tagService.updateTags(projectTeam.getId(), dto.getTags());
         ProjectTeam saved = projectTeamRepository.save(projectTeam);
-        ProjectTeamResponseDto res = mapper.map(saved, ProjectTeamResponseDto.class);
-        return res;
+        return makeResponseDto(saved);
     }
 
     public void deleteProjectTeam(Long teamId) {
         projectTeamRepository.deleteById(teamId);
+    }
+
+    public ProjectTeamResponseDto makeResponseDto(ProjectTeam projectTeam) {
+        ProjectTeamResponseDto res = mapper.map(projectTeam, ProjectTeamResponseDto.class);
+        res.setMembers(projectTeam.getRoles().stream()
+                .map(r->mapper.map(r.getMember(), MemberResponseDto.class))
+                .collect(Collectors.toList()));
+        return res;
     }
 
 }
