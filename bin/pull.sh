@@ -17,7 +17,7 @@ echo "==========================================="
 echo "2. Build"
 echo "==========================================="
 cd $REPO_DIR
-./gradlew build -x check
+./gradlew build --no-daemon -x check
 
 echo "==========================================="
 echo "3. Place war file to ROOT"
