@@ -283,6 +283,88 @@ class ProjectTeamServiceTest {
     @Test
     @DisplayName("팀 생성 후 멤버리스트 수정 테스트")
     void updateMemberList() {
+        MemberResponseDto memberA = memberManager.createMember("memberA", "111");
+        MemberResponseDto memberB = memberManager.createMember("memberB", "222");
+        MemberResponseDto memberC = memberManager.createMember("memberC", "333");
+
+        List<Long> memberList = new ArrayList<>();
+        memberList.add(memberB.getId());
+        memberList.add(memberC.getId());
+
+        List<String> tagList = new ArrayList<>();
+        tagList.add("TAG1");
+        tagList.add("MyTag");
+
+        String groupName = "team1";
+        String content = "Project Team";
+
+        ProjectTeamCreateDto dto = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(tagList)
+                .build();
+
+        ProjectTeamResponseDto saved = projectTeamService.createProjectTeam(dto);
+
+        List<ProjectRole> before = projectRoleRepository.findAllByTeamId(saved.getId());
+        System.out.println("BEFORE");
+        for (ProjectRole projectRole : before) {
+            System.out.println(projectRole.getMember().getName() + " / "
+                    + projectRole.getTeam().getGroupName() + " / "
+                    + projectRole.getRollName());
+        }
+        MemberResponseDto memberD = memberManager.createMember("memberD", "444");
+        memberList.remove(memberB.getId());
+        memberList.add(memberD.getId());
+
+        ProjectTeamUpdateDto updateDto = ProjectTeamUpdateDto.builder()
+                .id(saved.getId())
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(tagList)
+                .build();
+
+        ProjectTeamResponseDto updateProjectTeam = projectTeamService.updateProjectTeam(updateDto);
+
+        // memberB.roles 제거되었는지
+        Member oldMember = memberRepository.findById(memberB.getId()).get();
+        assertThat(oldMember.getRoles().stream()
+                .anyMatch(r -> r.getTeam().getId() == updateProjectTeam.getId()
+                        && r.getRollName().equals("MEMBER"))).isFalse();
+        // memberD.roles 추가되었는지
+        Member newMember = memberRepository.findById(memberD.getId()).get();
+        assertThat(newMember.getRoles().stream()
+                .anyMatch(r -> r.getTeam().getId() == updateProjectTeam.getId()
+                        && r.getRollName().equals("MEMBER"))).isTrue();
+        // roleList 잘 나오는지
+        List<ProjectRole> roleList = projectRoleRepository.findAllByTeamId(updateProjectTeam.getId());
+        assertThat(roleList.stream()
+                .anyMatch(r -> r.getTeam().getId() == updateProjectTeam.getId()
+                        && r.getRollName().equals("MEMBER")
+                        && r.getMember().getId() == oldMember.getId())).isFalse();
+        System.out.println("AFTER");
+        for (ProjectRole projectRole : roleList) {
+            System.out.println(projectRole.getMember().getName() + " / "
+                    + projectRole.getTeam().getGroupName() + " / "
+                    + projectRole.getRollName());
+        }
+        for (Long id : memberList) {
+            assertThat(roleList.stream()
+                    .anyMatch(r -> r.getRollName().equals("MEMBER")
+                            && r.getMember().getId() == id)).isTrue();
+        }
+        // team.roles.members 잘 제거되고 추가 되었는지
+        ProjectTeam findUpdateTeam = projectTeamRepository.findById(updateProjectTeam.getId()).get();
+        List<Role> updateRoles = findUpdateTeam.getRoles();
+        assertThat(updateRoles.size()).isEqualTo(memberList.size());
+        assertThat(updateRoles.stream()
+                .anyMatch(r -> r.getMember().getId() == oldMember.getId())).isFalse();
+        assertThat(updateRoles.stream()
+                .anyMatch(r -> r.getMember().getId() == newMember.getId())).isTrue();
 
     }
 
