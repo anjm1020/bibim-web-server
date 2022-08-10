@@ -9,6 +9,7 @@ import com.bibimbap.bibimweb.repository.team.tag.TeamTagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,11 +56,15 @@ public class TagService {
     public void updateTags(Long teamId, List<String> newTagNames) {
 
         Team team = teamRepository.findById(teamId).get();
+        List<TeamTag> deleteList = new ArrayList<>();
         team.getTags().forEach(tt -> {
             if (!newTagNames.contains(tt.getTag().getName())) {
-                this.deleteTeamTagById(tt.getId());
-                team.getTags().remove(tt);
+                deleteList.add(tt);
             }
+        });
+        deleteList.forEach(tt -> {
+            this.deleteTeamTagById(tt.getId());
+            team.getTags().remove(tt);
         });
         this.saveTags(teamId, newTagNames);
     }
@@ -73,9 +78,10 @@ public class TagService {
     }
 
     public void deleteTeamTagById(Long teamTagId) {
+        Long tagId = teamTagRepository.findById(teamTagId).get().getTag().getId();
         teamTagRepository.deleteById(teamTagId);
         if (!teamTagRepository.existsByTagId(teamTagId)) {
-            tagRepository.deleteById(teamTagId);
+            tagRepository.deleteById(tagId);
         }
     }
 }
