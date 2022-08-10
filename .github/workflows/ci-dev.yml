@@ -34,3 +34,5 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             whoami
+            cd //home/ubuntu/bibim-web-server/bin
+            ./pull.sh
