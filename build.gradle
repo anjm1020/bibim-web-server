@@ -30,7 +30,7 @@ dependencies {
 }
 
 bootWar {
-	archiveName = 'imageBoard.war'
+	archiveName = 'bibimWeb.war'
 }
 
 tasks.named('test') {
