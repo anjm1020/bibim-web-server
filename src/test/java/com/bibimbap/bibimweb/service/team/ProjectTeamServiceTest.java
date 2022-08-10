@@ -12,6 +12,7 @@ import com.bibimbap.bibimweb.dto.team.project.ProjectTeamUpdateDto;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.ProjectRoleRepository;
 import com.bibimbap.bibimweb.repository.team.ProjectTeamRepository;
+import com.bibimbap.bibimweb.repository.team.tag.TagRepository;
 import com.bibimbap.bibimweb.repository.team.tag.TeamTagRepository;
 import com.bibimbap.bibimweb.service.lib.MemberManager;
 import com.bibimbap.bibimweb.service.role.ProjectRoleService;
@@ -39,6 +40,8 @@ class ProjectTeamServiceTest {
     ProjectTeamService projectTeamService;
     @Autowired
     ProjectTeamRepository projectTeamRepository;
+    @Autowired
+    TagRepository tagRepository;
     @Autowired
     TeamTagRepository teamTagRepository;
     @Autowired
@@ -90,6 +93,7 @@ class ProjectTeamServiceTest {
         List<MemberResponseDto> members = saved.getMembers();
         assertThat(members.size()).isEqualTo(memberList.size());
         for (MemberResponseDto member : members) {
+            System.out.println(member);
             assertThat(memberList.stream().anyMatch(id -> member.getId() == id)).isTrue();
         }
         // Role
@@ -360,7 +364,13 @@ class ProjectTeamServiceTest {
         // team.roles.members 잘 제거되고 추가 되었는지
         ProjectTeam findUpdateTeam = projectTeamRepository.findById(updateProjectTeam.getId()).get();
         List<Role> updateRoles = findUpdateTeam.getRoles();
-        assertThat(updateRoles.size()).isEqualTo(memberList.size());
+        System.out.println("AFTER TEAM.ROLES");
+        for (Role projectRole : updateRoles) {
+            System.out.println(projectRole.getMember().getName() + " / "
+                    + projectRole.getTeam().getGroupName() + " / "
+                    + projectRole.getRollName());
+        }
+        assertThat(updateRoles.size()).isEqualTo(memberList.size() + 1);
         assertThat(updateRoles.stream()
                 .anyMatch(r -> r.getMember().getId() == oldMember.getId())).isFalse();
         assertThat(updateRoles.stream()
@@ -371,13 +381,179 @@ class ProjectTeamServiceTest {
     @Test
     @DisplayName("팀 생성 후 태그 수정 테스트")
     void updateTagList() {
+        MemberResponseDto memberA = memberManager.createMember("memberA", "111");
+        MemberResponseDto memberB = memberManager.createMember("memberB", "222");
+        MemberResponseDto memberC = memberManager.createMember("memberC", "333");
 
+        List<Long> memberList = new ArrayList<>();
+        memberList.add(memberB.getId());
+        memberList.add(memberC.getId());
+
+        String keepTag = "TAG1";
+        String deleteTag = "MyTag";
+        String newTag = "MyTag2";
+
+        List<String> tagList = new ArrayList<>();
+        tagList.add(keepTag);
+        tagList.add(deleteTag);
+
+        String groupName = "team1";
+        String content = "Project Team";
+
+        ProjectTeamCreateDto dto = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(tagList)
+                .build();
+
+        ProjectTeamResponseDto saved = projectTeamService.createProjectTeam(dto);
+
+        List<String> newTagList = new ArrayList<>();
+        newTagList.add(keepTag);
+        newTagList.add(newTag);
+
+        ProjectTeamResponseDto updateProjectTeam = projectTeamService.updateProjectTeam(ProjectTeamUpdateDto.builder()
+                .id(saved.getId())
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(newTagList)
+                .build());
+
+        // Team.Tags
+        ProjectTeam findProjectTeam = projectTeamRepository.findById(updateProjectTeam.getId()).get();
+        List<TeamTag> tags = findProjectTeam.getTags();
+        assertThat(tags.size()).isEqualTo(newTagList.size());
+        assertThat(tags.stream()
+                .anyMatch(tag -> tag.getTag().getName().equals(deleteTag))).isFalse();
+        for (TeamTag tag : tags) {
+            assertThat(tag.getTeam().getId()).isEqualTo(findProjectTeam.getId());
+            assertThat(newTagList.stream()
+                    .anyMatch(name -> tag.getTag().getName().equals(name))).isTrue();
+        }
+        // Tags
+        List<TeamTag> findTags = teamTagRepository.findAllByTeamId(updateProjectTeam.getId());
+        for (TeamTag tTag : findTags) {
+            assertThat(tTag.getTag().getTeamTagList().stream()
+                    .anyMatch(t -> t.getTeam().getId() == findProjectTeam.getId())).isTrue();
+        }
     }
 
     @Test
     @DisplayName("한 멤버에 여러 팀 가입 -> Member.Roles,Team.Roles 필드가 제대로 나온는지 테스트")
     void oneMemberMultipleTeam() {
+        MemberResponseDto memberA = memberManager.createMember("memberA", "111");
+        MemberResponseDto memberB = memberManager.createMember("memberB", "222");
+        MemberResponseDto memberC = memberManager.createMember("memberC", "333");
+        MemberResponseDto memberD = memberManager.createMember("memberD", "333");
 
+        List<Long> team1MemberList = new ArrayList<>();
+        team1MemberList.add(memberB.getId());
+        team1MemberList.add(memberC.getId());
+
+        String keepTag = "TAG1";
+        String deleteTag = "MyTag";
+
+        List<String> tagList = new ArrayList<>();
+        tagList.add(keepTag);
+        tagList.add(deleteTag);
+
+        String groupName = "team1";
+        String content = "Project Team";
+
+        ProjectTeamCreateDto team1Dto = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(team1MemberList)
+                .tags(tagList)
+                .build();
+
+        List<Long> team2MemberList = new ArrayList<>();
+        team2MemberList.add(memberA.getId());
+        team2MemberList.add(memberC.getId());
+        team2MemberList.add(memberD.getId());
+
+        ProjectTeamCreateDto team2Dto = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberB.getId())
+                .content(content)
+                .members(team2MemberList)
+                .tags(tagList)
+                .build();
+
+        ProjectTeamResponseDto team1 = projectTeamService.createProjectTeam(team1Dto);
+        ProjectTeamResponseDto team2 = projectTeamService.createProjectTeam(team2Dto);
+
+        // A 1L , 2M
+        // B 1M , 2L
+        // C 1M , 2M
+        // D 2M
+        // member.roles
+        List<Role> aRoles = memberRepository.findById(memberA.getId()).get().getRoles();
+        assertThat(aRoles.size()).isEqualTo(2);
+        assertThat(aRoles.stream()
+                .anyMatch(r -> r.getRollName().equals("LEADER")
+                        && r.getTeam().getId() == team1.getId()
+                        && r.getMember().getId() == memberA.getId())).isTrue();
+        assertThat(aRoles.stream()
+                .anyMatch(r -> r.getRollName().equals("MEMBER")
+                        && r.getTeam().getId() == team2.getId()
+                        && r.getMember().getId() == memberA.getId())).isTrue();
+        List<Role> bRoles = memberRepository.findById(memberB.getId()).get().getRoles();
+        assertThat(bRoles.size()).isEqualTo(2);
+        assertThat(bRoles.stream()
+                .anyMatch(r -> r.getRollName().equals("MEMBER")
+                        && r.getTeam().getId() == team1.getId()
+                        && r.getMember().getId() == memberB.getId())).isTrue();
+        assertThat(bRoles.stream()
+                .anyMatch(r -> r.getRollName().equals("LEADER")
+                        && r.getTeam().getId() == team2.getId()
+                        && r.getMember().getId() == memberB.getId())).isTrue();
+        List<Role> cRoles = memberRepository.findById(memberC.getId()).get().getRoles();
+        assertThat(cRoles.size()).isEqualTo(2);
+        assertThat(cRoles.stream()
+                .anyMatch(r -> r.getRollName().equals("MEMBER")
+                        && r.getTeam().getId() == team1.getId()
+                        && r.getMember().getId() == memberC.getId())).isTrue();
+        assertThat(cRoles.stream()
+                .anyMatch(r -> r.getRollName().equals("MEMBER")
+                        && r.getTeam().getId() == team2.getId()
+                        && r.getMember().getId() == memberC.getId())).isTrue();
+        List<Role> dRoles = memberRepository.findById(memberD.getId()).get().getRoles();
+        assertThat(dRoles.size()).isEqualTo(1);
+        assertThat(dRoles.stream()
+                .anyMatch(r -> r.getRollName().equals("MEMBER")
+                        && r.getTeam().getId() == team2.getId()
+                        && r.getMember().getId() == memberD.getId())).isTrue();
+
+        // team.roles
+        ProjectTeam findTeam1 = projectTeamRepository.findById(team1.getId()).get();
+        List<Role> team1Roles = findTeam1.getRoles();
+        assertThat(team1Roles.size()).isEqualTo(team1MemberList.size() + 1);
+        for (Role r : team1Roles) {
+            assertThat(r.getTeam().getId()).isEqualTo(team1.getId());
+            if (r.getRollName() == "LEADER") {
+                assertThat(r.getMember().getId()).isEqualTo(memberA.getId());
+            } else {
+                assertThat(team1MemberList.stream().anyMatch(id -> r.getMember().getId() == id)).isTrue();
+            }
+        }
+
+        ProjectTeam findTeam2 = projectTeamRepository.findById(team2.getId()).get();
+        List<Role> team2Roles = findTeam2.getRoles();
+        assertThat(team2Roles.size()).isEqualTo(team2MemberList.size() + 1);
+        for (Role r : team2Roles) {
+            assertThat(r.getTeam().getId()).isEqualTo(team2.getId());
+            if (r.getRollName() == "LEADER") {
+                assertThat(r.getMember().getId()).isEqualTo(memberB.getId());
+            } else {
+                assertThat(team2MemberList.stream().anyMatch(id -> r.getMember().getId() == id)).isTrue();
+            }
+        }
     }
 
     @Test
