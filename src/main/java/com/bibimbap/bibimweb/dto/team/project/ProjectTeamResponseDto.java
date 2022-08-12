@@ -16,7 +16,7 @@ public class ProjectTeamResponseDto {
     private Long id;
     private String groupName;
     private MemberResponseDto leader;
-    private String period;
+    private Integer period;
 
     private String content;
 
