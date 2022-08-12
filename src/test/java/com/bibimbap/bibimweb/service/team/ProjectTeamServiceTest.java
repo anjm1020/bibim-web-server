@@ -557,13 +557,101 @@ class ProjectTeamServiceTest {
     @Test
     @DisplayName("팀 삭제 시 Member.Roles 가 제대로 변경 되는지 테스트")
     void checkMemberRoleAfterDelete() {
+        MemberResponseDto memberA = memberManager.createMember("memberA", "111");
+        MemberResponseDto memberB = memberManager.createMember("memberB", "222");
+        MemberResponseDto memberC = memberManager.createMember("memberC", "333");
 
+        List<Long> memberList = new ArrayList<>();
+        memberList.add(memberB.getId());
+        memberList.add(memberC.getId());
+
+        List<String> tagList = new ArrayList<>();
+        tagList.add("TAG1");
+        tagList.add("MyTag");
+
+        String groupName = "team1";
+        String content = "Project Team";
+
+        ProjectTeamCreateDto dto = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(tagList)
+                .build();
+
+        ProjectTeamResponseDto saved = projectTeamService.createProjectTeam(dto);
+
+        projectTeamService.deleteProjectTeam(saved.getId());
+
+        Member findMemberA = memberRepository.findById(memberA.getId()).get();
+        Member findMemberB = memberRepository.findById(memberB.getId()).get();
+        Member findMemberC = memberRepository.findById(memberC.getId()).get();
+
+        assertThat(findMemberA.getRoles().stream()
+                .anyMatch(r -> r.getRollName().equals("LEADER")
+                        && r.getMember().getId() == findMemberA.getId()
+                        && r.getTeam().getId() == saved.getId())).isFalse();
+        assertThat(findMemberB.getRoles().stream()
+                .anyMatch(r -> r.getRollName().equals("MEMBER")
+                        && r.getMember().getId() == findMemberA.getId()
+                        && r.getTeam().getId() == saved.getId())).isFalse();
+        assertThat(findMemberC.getRoles().stream()
+                .anyMatch(r -> r.getRollName().equals("MEMBER")
+                        && r.getMember().getId() == findMemberA.getId()
+                        && r.getTeam().getId() == saved.getId())).isFalse();
+
+        List<ProjectRole> roles = projectRoleRepository.findAllByTeamId(saved.getId());
+        assertThat(roles.size()).isEqualTo(0);
     }
 
     @Test
     @DisplayName("팀 삭제 시 TeamTag 가 제대로 보존 or 삭제 되는지 테스트")
     void checkTagAfterDelete() {
+        MemberResponseDto memberA = memberManager.createMember("memberA", "111");
+        MemberResponseDto memberB = memberManager.createMember("memberB", "222");
+        MemberResponseDto memberC = memberManager.createMember("memberC", "333");
 
+        List<Long> memberList = new ArrayList<>();
+        memberList.add(memberB.getId());
+        memberList.add(memberC.getId());
+
+        List<String> tagList = new ArrayList<>();
+        tagList.add("TAG1");
+        tagList.add("MyTag");
+
+        List<String> tagList2 = new ArrayList<>();
+        tagList2.add("TAG1");
+
+        String groupName = "team1";
+        String content = "Project Team";
+
+        ProjectTeamCreateDto dto = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(tagList)
+                .build();
+
+        ProjectTeamCreateDto dto2 = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(tagList2)
+                .build();
+
+        ProjectTeamResponseDto saved = projectTeamService.createProjectTeam(dto);
+        ProjectTeamResponseDto saved2 = projectTeamService.createProjectTeam(dto2);
+
+        projectTeamService.deleteProjectTeam(saved.getId());
+
+        List<TeamTag> teamTags = teamTagRepository.findAllByTeamId(saved.getId());
+        assertThat(teamTags.size()).isEqualTo(0);
+
+        assertThat(tagRepository.findByName("TAG1").isPresent()).isTrue();
+        assertThat(tagRepository.findByName("MyTag").isPresent()).isFalse();
     }
 
     @Test

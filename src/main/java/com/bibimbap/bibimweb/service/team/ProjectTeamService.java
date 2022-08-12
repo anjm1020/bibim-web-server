@@ -156,6 +156,15 @@ public class ProjectTeamService {
     }
 
     public void deleteProjectTeam(Long teamId) {
+        ProjectTeam projectTeam = projectTeamRepository.findById(teamId).get();
+        // role 지워주기
+        projectTeam.getMemberRoles().stream()
+                .forEach(pr -> {
+                    pr.getMember().getRoles().remove(pr);
+                    projectRoleRepository.deleteById(pr.getId());
+                });
+        // tag 지워주기
+        tagService.deleteAllTeamTag(teamId);
         projectTeamRepository.deleteById(teamId);
     }
 
