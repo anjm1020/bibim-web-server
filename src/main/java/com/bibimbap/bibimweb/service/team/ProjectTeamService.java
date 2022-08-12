@@ -63,6 +63,7 @@ public class ProjectTeamService {
                 .rollName("LEADER")
                 .build());
         leader.getRoles().add(leaderRole);
+        saved.getMemberRoles().add(leaderRole);
 
         // 멤버 리스트 잡고 저장해주기
         for (Long memberId : dto.getMembers()) {
@@ -106,6 +107,7 @@ public class ProjectTeamService {
                     .member(leader)
                     .rollName("LEADER")
                     .build());
+            projectTeam.getMemberRoles().add(savedLeaderRole);
             leader.getRoles().add(savedLeaderRole);
         } else {
             ProjectRole projectRole = leaderRole.get();
@@ -135,16 +137,15 @@ public class ProjectTeamService {
             }
         }
 
+        List<ProjectRole> tmp = projectRoleRepository.findAllByTeamId(dto.getId());
+
         // find member to delete
         List<ProjectRole> teamMembers = projectRoleRepository.findAllByTeamIdAndRollName(dto.getId(), "MEMBER");
         for (ProjectRole pr : teamMembers) {
-            Optional<Long> found = members.stream()
-                    .filter(o -> pr.getMember().getId() == o)
-                    .findAny();
-            if (found.isEmpty()) {
-                projectRoleRepository.deleteById(pr.getId());
+            if (!members.stream().anyMatch(id -> pr.getMember().getId() == id)) {
                 pr.getMember().getRoles().remove(pr);
-                projectTeam.getMemberRoles().remove(pr);
+                pr.getTeam().getMemberRoles().remove(pr);
+                projectRoleRepository.deleteById(pr.getId());
             }
         }
 
@@ -161,9 +162,9 @@ public class ProjectTeamService {
     public ProjectTeamResponseDto makeResponseDto(ProjectTeam projectTeam) {
         ProjectTeamResponseDto res = mapper.map(projectTeam, ProjectTeamResponseDto.class);
         res.setMembers(projectTeam.getMemberRoles().stream()
-                .map(r->mapper.map(r.getMember(), MemberResponseDto.class))
+                .filter(r -> r.getRollName().equals("MEMBER"))
+                .map(r -> mapper.map(r.getMember(), MemberResponseDto.class))
                 .collect(Collectors.toList()));
         return res;
     }
-
 }
