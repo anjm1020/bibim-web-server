@@ -361,7 +361,12 @@ class ProjectTeamServiceTest {
         // team.roles.members 잘 제거되고 추가 되었는지
         ProjectTeam findUpdateTeam = projectTeamRepository.findById(updateProjectTeam.getId()).get();
         List<Role> updateRoles = findUpdateTeam.getMemberRoles();
-        assertThat(updateRoles.size()).isEqualTo(newMemberList.size());
+        for (Role updateRole : updateRoles) {
+            System.out.println(updateRole.getMember().getName() + " / "
+                    + updateRole.getTeam().getGroupName() + " / "
+                    + updateRole.getRollName());
+        }
+        assertThat(updateRoles.size()).isEqualTo(newMemberList.size() + 1);
         assertThat(updateRoles.stream()
                 .anyMatch(r -> r.getRollName().equals("MEMBER")
                         && r.getMember().getId() == oldMember.getId())).isFalse();
@@ -525,7 +530,7 @@ class ProjectTeamServiceTest {
 
         // team.roles
         ProjectTeam findTeam1 = projectTeamRepository.findById(team1.getId()).get();
-        List<Role> team1Roles = findTeam1.getRoles();
+        List<Role> team1Roles = findTeam1.getMemberRoles();
         assertThat(team1Roles.size()).isEqualTo(team1MemberList.size() + 1);
         for (Role r : team1Roles) {
             assertThat(r.getTeam().getId()).isEqualTo(team1.getId());
@@ -537,7 +542,7 @@ class ProjectTeamServiceTest {
         }
 
         ProjectTeam findTeam2 = projectTeamRepository.findById(team2.getId()).get();
-        List<Role> team2Roles = findTeam2.getRoles();
+        List<Role> team2Roles = findTeam2.getMemberRoles();
         assertThat(team2Roles.size()).isEqualTo(team2MemberList.size() + 1);
         for (Role r : team2Roles) {
             assertThat(r.getTeam().getId()).isEqualTo(team2.getId());
@@ -547,6 +552,18 @@ class ProjectTeamServiceTest {
                 assertThat(team2MemberList.stream().anyMatch(id -> r.getMember().getId() == id)).isTrue();
             }
         }
+    }
+
+    @Test
+    @DisplayName("팀 삭제 시 Member.Roles 가 제대로 변경 되는지 테스트")
+    void checkMemberRoleAfterDelete() {
+
+    }
+
+    @Test
+    @DisplayName("팀 삭제 시 TeamTag 가 제대로 보존 or 삭제 되는지 테스트")
+    void checkTagAfterDelete() {
+
     }
 
     @Test
@@ -564,18 +581,6 @@ class ProjectTeamServiceTest {
     @Test
     @DisplayName("단일 id로 팀 조회 테스트")
     void getTeamById() {
-
-    }
-
-    @Test
-    @DisplayName("팀 삭제 시 Member.Roles 가 제대로 변경 되는지 테스트")
-    void checkMemberRoleAfterDelete() {
-
-    }
-
-    @Test
-    @DisplayName("팀 삭제 시 TeamTag 가 제대로 보존 or 삭제 되는지 테스트")
-    void checkTagAfterDelete() {
 
     }
 }
