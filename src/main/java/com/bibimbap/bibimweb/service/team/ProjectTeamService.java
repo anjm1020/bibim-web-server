@@ -73,7 +73,7 @@ public class ProjectTeamService {
                     .rollName("MEMBER")
                     .build());
             member.getRoles().add(memberRole);
-            saved.getRoles().add(memberRole);
+            saved.getMemberRoles().add(memberRole);
         }
         // Tag Setting
         tagService.saveTags(saved.getId(), dto.getTags());
@@ -130,7 +130,7 @@ public class ProjectTeamService {
                         .rollName("MEMBER")
                         .build());
                 curr.getRoles().add(savedMemberRole);
-                projectTeam.getRoles().add(savedMemberRole);
+                projectTeam.getMemberRoles().add(savedMemberRole);
                 memberRepository.save(curr);
             }
         }
@@ -139,11 +139,12 @@ public class ProjectTeamService {
         List<ProjectRole> teamMembers = projectRoleRepository.findAllByTeamIdAndRollName(dto.getId(), "MEMBER");
         for (ProjectRole pr : teamMembers) {
             Optional<Long> found = members.stream()
-                    .filter(o -> pr.getId() == o)
+                    .filter(o -> pr.getMember().getId() == o)
                     .findAny();
             if (found.isEmpty()) {
                 projectRoleRepository.deleteById(pr.getId());
                 pr.getMember().getRoles().remove(pr);
+                projectTeam.getMemberRoles().remove(pr);
             }
         }
 
@@ -159,7 +160,7 @@ public class ProjectTeamService {
 
     public ProjectTeamResponseDto makeResponseDto(ProjectTeam projectTeam) {
         ProjectTeamResponseDto res = mapper.map(projectTeam, ProjectTeamResponseDto.class);
-        res.setMembers(projectTeam.getRoles().stream()
+        res.setMembers(projectTeam.getMemberRoles().stream()
                 .map(r->mapper.map(r.getMember(), MemberResponseDto.class))
                 .collect(Collectors.toList()));
         return res;
