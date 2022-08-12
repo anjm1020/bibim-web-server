@@ -21,6 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 
 import javax.transaction.Transactional;
 
@@ -83,7 +84,7 @@ class ProjectTeamServiceTest {
         // ProjectTeam
         assertThat(saved.getGroupName()).isEqualTo(groupName);
         assertThat(saved.getContent()).isEqualTo(content);
-        assertThat(saved.getPeriod()).isEqualTo(String.valueOf(LocalDate.now().getYear()));
+        assertThat(saved.getPeriod()).isEqualTo(LocalDate.now().getYear());
 
         // Member
         MemberResponseDto leader = saved.getLeader();
@@ -191,7 +192,7 @@ class ProjectTeamServiceTest {
         ProjectTeamResponseDto updateProjectTeam = projectTeamService.updateProjectTeam(updateDto);
 
         assertThat(updateProjectTeam.getId()).isEqualTo(saved.getId());
-        assertThat(updateProjectTeam.getPeriod()).isEqualTo(String.valueOf(LocalDate.now().getYear()));
+        assertThat(updateProjectTeam.getPeriod()).isEqualTo(LocalDate.now().getYear());
         assertThat(updateProjectTeam.getGroupName()).isEqualTo(groupName);
         assertThat(updateProjectTeam.getContent()).isEqualTo(content);
 
@@ -199,21 +200,21 @@ class ProjectTeamServiceTest {
         List<ProjectRole> roleListByTeamId = projectRoleRepository.findAllByTeamId(updateProjectTeam.getId());
         for (ProjectRole projectRole : roleListByTeamId) {
             assertThat(projectRole.getTeam().getGroupName()).isEqualTo(groupName);
-            assertThat(projectRole.getTeam().getPeriod()).isEqualTo(String.valueOf(LocalDate.now().getYear()));
+            assertThat(projectRole.getTeam().getPeriod()).isEqualTo((LocalDate.now().getYear()));
         }
         // Member.Role.Team
         for (Long id : memberList) {
             Member member = memberRepository.findById(id).get();
             for (Role role : member.getRoles()) {
                 assertThat(role.getTeam().getGroupName()).isEqualTo(groupName);
-                assertThat(role.getTeam().getPeriod()).isEqualTo(String.valueOf(LocalDate.now().getYear()));
+                assertThat(role.getTeam().getPeriod()).isEqualTo((LocalDate.now().getYear()));
             }
         }
         // TeamTag.Team
         List<TeamTag> tagListByTeamId = teamTagRepository.findAllByTeamId(updateProjectTeam.getId());
         for (TeamTag teamTag : tagListByTeamId) {
             assertThat(teamTag.getTeam().getGroupName()).isEqualTo(groupName);
-            assertThat(teamTag.getTeam().getPeriod()).isEqualTo(String.valueOf(LocalDate.now().getYear()));
+            assertThat(teamTag.getTeam().getPeriod()).isEqualTo((LocalDate.now().getYear()));
         }
     }
 
@@ -657,12 +658,67 @@ class ProjectTeamServiceTest {
     @Test
     @DisplayName("페이지네이션을 통한 팀 리스트 불러오기 테스트")
     void getListByPage() {
+        MemberResponseDto memberA = memberManager.createMember("memberA", "111");
+        MemberResponseDto memberB = memberManager.createMember("memberB", "222");
+        MemberResponseDto memberC = memberManager.createMember("memberC", "333");
+
+        List<Long> memberList = new ArrayList<>();
+        memberList.add(memberB.getId());
+        memberList.add(memberC.getId());
+
+        List<String> tagList = new ArrayList<>();
+        String TAG1 = "TAG1";
+        tagList.add(TAG1);
+        String TAG2 = "MyTag";
+        tagList.add(TAG2);
+
+        String groupName = "team1";
+        String content = "Project Team";
+
+        ProjectTeamCreateDto dto = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(tagList)
+                .build();
+
+        ProjectTeamResponseDto saved = projectTeamService.createProjectTeam(dto);
+        String TAG3 = "MyTag2";
+        tagList.add(TAG3);
+
+        ProjectTeamCreateDto dto2 = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(tagList)
+                .build();
+        ProjectTeamResponseDto saved2 = projectTeamService.createProjectTeam(dto2);
+
+        List<ProjectTeamResponseDto> list1 = projectTeamService.getProjectTeamList(PageRequest.of(0, 5), "", TAG1);
+        assertThat(list1.size()).isEqualTo(2);
+        list1.forEach(team -> assertThat(team.getTags()).contains(TAG2));
+
+        List<ProjectTeamResponseDto> list2 = projectTeamService.getProjectTeamList(PageRequest.of(0, 5), "", TAG2);
+        assertThat(list2.size()).isEqualTo(2);
+        list2.forEach(team -> assertThat(team.getTags()).contains(TAG2));
+
+        List<ProjectTeamResponseDto> list3 = projectTeamService.getProjectTeamList(PageRequest.of(0, 5), "", TAG3);
+        assertThat(list3.size()).isEqualTo(1);
+        list3.forEach(team -> assertThat(team.getTags()).contains(TAG3));
 
     }
 
     @Test
     @DisplayName("태그를 통해 팀 리스트 불러오기 테스트")
     void getListByTag() {
+
+    }
+
+    @Test
+    @DisplayName("년도를 통해 팀 리스트 불러오기 테스트")
+    void getListByYear() {
 
     }
 
