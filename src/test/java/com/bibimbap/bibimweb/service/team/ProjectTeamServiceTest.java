@@ -16,6 +16,7 @@ import com.bibimbap.bibimweb.repository.team.tag.TagRepository;
 import com.bibimbap.bibimweb.repository.team.tag.TeamTagRepository;
 import com.bibimbap.bibimweb.service.lib.MemberManager;
 import com.bibimbap.bibimweb.service.role.ProjectRoleService;
+import com.bibimbap.bibimweb.util.exception.OutOfRangeException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -682,6 +683,53 @@ class ProjectTeamServiceTest {
                 .members(memberList)
                 .tags(tagList)
                 .build();
+        Long firstId = 1L;
+        List<Long> idList = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            Long saved = projectTeamService.createProjectTeam(dto).getId();
+            idList.add(saved);
+            if (i == 0) {
+                firstId = saved;
+            }
+        }
+
+        // pagination
+        int page, size;
+        page = 5;
+        size = 10;
+        List<ProjectTeamResponseDto> list1 = projectTeamService.getProjectTeamList(PageRequest.of(page, size), "", "");
+        assertThat(list1.size()).isEqualTo(size);
+        assertThat(list1.get(0).getId()).isEqualTo(firstId + page * size);
+        assertThat(list1.get(list1.size() - 1).getId()).isEqualTo(firstId + (page + 1) * size - 1);
+    }
+
+    @Test
+    @DisplayName("태그를 통해 팀 리스트 불러오기 테스트")
+    void getListByTag() {
+        MemberResponseDto memberA = memberManager.createMember("memberA", "111");
+        MemberResponseDto memberB = memberManager.createMember("memberB", "222");
+        MemberResponseDto memberC = memberManager.createMember("memberC", "333");
+
+        List<Long> memberList = new ArrayList<>();
+        memberList.add(memberB.getId());
+        memberList.add(memberC.getId());
+
+        List<String> tagList = new ArrayList<>();
+        String TAG1 = "TAG1";
+        tagList.add(TAG1);
+        String TAG2 = "MyTag";
+        tagList.add(TAG2);
+
+        String groupName = "team1";
+        String content = "Project Team";
+
+        ProjectTeamCreateDto dto = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(tagList)
+                .build();
 
         ProjectTeamResponseDto saved = projectTeamService.createProjectTeam(dto);
         String TAG3 = "MyTag2";
@@ -711,20 +759,99 @@ class ProjectTeamServiceTest {
     }
 
     @Test
-    @DisplayName("태그를 통해 팀 리스트 불러오기 테스트")
-    void getListByTag() {
-
-    }
-
-    @Test
     @DisplayName("년도를 통해 팀 리스트 불러오기 테스트")
     void getListByYear() {
+        MemberResponseDto memberA = memberManager.createMember("memberA", "111");
+        MemberResponseDto memberB = memberManager.createMember("memberB", "222");
+        MemberResponseDto memberC = memberManager.createMember("memberC", "333");
 
+        List<Long> memberList = new ArrayList<>();
+        memberList.add(memberB.getId());
+        memberList.add(memberC.getId());
+
+        List<String> tagList = new ArrayList<>();
+        String TAG1 = "TAG1";
+        tagList.add(TAG1);
+        String TAG2 = "MyTag";
+        tagList.add(TAG2);
+
+        String groupName = "team1";
+        String content = "Project Team";
+
+        ProjectTeamCreateDto dto = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(tagList)
+                .build();
+
+        int period2022Count = 5;
+        for (int i = 0; i < period2022Count; i++) {
+            projectTeamService.createProjectTeam(dto);
+        }
+
+        int period2021Count = 3;
+        String period2021GroupName = "groupName2021";
+        for (int i = 0; i < period2021Count; i++) {
+            projectTeamRepository.save(ProjectTeam.builder()
+                    .groupName(period2021GroupName)
+                    .period(2021)
+                    .build());
+        }
+
+        List<ProjectTeamResponseDto> list2022 = projectTeamService.getProjectTeamList(PageRequest.of(0, 10), "2022", "");
+        assertThat(list2022.size()).isEqualTo(period2022Count);
+        list2022.forEach(team -> assertThat(team.getGroupName().equals(groupName)));
+        System.out.println("2022");
+        for (ProjectTeamResponseDto projectTeamResponseDto : list2022) {
+            System.out.println(projectTeamResponseDto.getGroupName()+" / "+projectTeamResponseDto.getId());
+        }
+
+        List<ProjectTeamResponseDto> list2021 = projectTeamService.getProjectTeamList(PageRequest.of(0, 10), "2021", "");
+        assertThat(list2021.size()).isEqualTo(period2021Count);
+        list2021.forEach(team -> assertThat(team.getGroupName().equals(period2021GroupName)));
+        System.out.println("2021");
+        for (ProjectTeamResponseDto projectTeamResponseDto : list2021) {
+            System.out.println(projectTeamResponseDto.getGroupName()+" / "+projectTeamResponseDto.getId());
+        }
     }
+
 
     @Test
     @DisplayName("단일 id로 팀 조회 테스트")
     void getTeamById() {
+        MemberResponseDto memberA = memberManager.createMember("memberA", "111");
+        MemberResponseDto memberB = memberManager.createMember("memberB", "222");
+        MemberResponseDto memberC = memberManager.createMember("memberC", "333");
+
+        List<Long> memberList = new ArrayList<>();
+        memberList.add(memberB.getId());
+        memberList.add(memberC.getId());
+
+        List<String> tagList = new ArrayList<>();
+        String TAG1 = "TAG1";
+        tagList.add(TAG1);
+        String TAG2 = "MyTag";
+        tagList.add(TAG2);
+
+        String groupName = "team1";
+        String content = "Project Team";
+
+        ProjectTeamCreateDto dto = ProjectTeamCreateDto.builder()
+                .groupName(groupName)
+                .leaderId(memberA.getId())
+                .content(content)
+                .members(memberList)
+                .tags(tagList)
+                .build();
+
+        ProjectTeamResponseDto saved = projectTeamService.createProjectTeam(dto);
+
+        ProjectTeamResponseDto res = projectTeamService.getProjectTeamById(saved.getId());
+        assertThat(res.getId()).isEqualTo(saved.getId());
+        res.getMembers().forEach(member->assertThat(memberList.contains(member.getId())).isTrue());
+        res.getTags().forEach(tag -> assertThat(tagList.contains(tag)).isTrue());
 
     }
 }
