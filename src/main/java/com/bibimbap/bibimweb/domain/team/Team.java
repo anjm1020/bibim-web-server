@@ -19,19 +19,28 @@ public class Team {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "team_id")
     private Long id;
 
+    @Column(name = "group_name")
     private String groupName;
 
-    @ManyToOne
-    @JoinColumn
-    private Member leader;
-
+    @Column(name = "period")
     private String period;
+
+    @Column(name = "git_url")
+    private String gitURL;
+
+    @Column(name = "blog_url")
+    private String blogURL;
+
+    @ManyToOne
+    @JoinColumn(name = "leader_id")
+    private Member leader;
 
     @Builder.Default
     @OneToMany(mappedBy = "team")
-    private List<Role> roles = new ArrayList<>();
+    private List<Role> memberRoles = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "team")

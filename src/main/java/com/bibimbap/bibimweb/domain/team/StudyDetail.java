@@ -2,10 +2,7 @@ package com.bibimbap.bibimweb.domain.team;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -17,7 +14,12 @@ public class StudyDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "study_detail_id")
     private Long id;
 
-    private String detail;
+    @Column(name = "week")
+    private Integer week;
+
+    @Column(name = "content")
+    private String content;
 }

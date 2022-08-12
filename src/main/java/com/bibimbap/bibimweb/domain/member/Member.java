@@ -15,9 +15,14 @@ import java.util.List;
 @DiscriminatorColumn
 public class Member {
     @Id
+    @Column(name = "member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "student_id")
     private String studentId;
 
     @OneToMany(mappedBy = "member")

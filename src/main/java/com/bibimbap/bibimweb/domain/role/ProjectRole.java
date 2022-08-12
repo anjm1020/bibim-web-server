@@ -5,10 +5,7 @@ import com.bibimbap.bibimweb.domain.team.ProjectTeam;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 @SuperBuilder
@@ -18,6 +15,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @DiscriminatorValue("byProject")
 public class ProjectRole extends Role {
-    private String filed;
+    @Column(name = "field")
+    private String field;
 }
 

@@ -17,8 +17,7 @@ import java.util.List;
 @AllArgsConstructor @NoArgsConstructor
 @DiscriminatorValue("byStudy")
 public class StudyTeam extends Team {
-
     @OneToMany
-    @JoinColumn(name = "teamId")
+    @JoinColumn(name = "team_id")
     private List<StudyDetail> details;
 }

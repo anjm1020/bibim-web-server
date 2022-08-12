@@ -16,15 +16,17 @@ public class Role  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "role_id")
     private Long id;
 
+    @Column(name = "roll_name")
     private String rollName;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "team_id")
     private Team team;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "member_id")
     private Member member;
 }

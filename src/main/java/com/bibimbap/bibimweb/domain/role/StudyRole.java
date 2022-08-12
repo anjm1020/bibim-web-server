@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @SuperBuilder
@@ -20,7 +19,9 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @DiscriminatorValue("byStudy")
 public class StudyRole extends Role {
-
-
+    @Column(name = "group_number")
     private Integer groupNumber;
+
+    @Column(name = "attendance")
+    private String attendance;
 }
