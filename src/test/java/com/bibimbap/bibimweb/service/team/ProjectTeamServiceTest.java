@@ -316,19 +316,21 @@ class ProjectTeamServiceTest {
                     + projectRole.getRollName());
         }
         MemberResponseDto memberD = memberManager.createMember("memberD", "444");
-        memberList.remove(memberB.getId());
-        memberList.add(memberD.getId());
+        List<Long> newMemberList = new ArrayList<>();
+        newMemberList.add(memberC.getId());
+        newMemberList.add(memberD.getId());
 
         ProjectTeamUpdateDto updateDto = ProjectTeamUpdateDto.builder()
                 .id(saved.getId())
                 .groupName(groupName)
                 .leaderId(memberA.getId())
                 .content(content)
-                .members(memberList)
+                .members(newMemberList)
                 .tags(tagList)
                 .build();
 
         ProjectTeamResponseDto updateProjectTeam = projectTeamService.updateProjectTeam(updateDto);
+
 
         // memberB.roles 제거되었는지
         Member oldMember = memberRepository.findById(memberB.getId()).get();
@@ -346,25 +348,22 @@ class ProjectTeamServiceTest {
                 .anyMatch(r -> r.getTeam().getId() == updateProjectTeam.getId()
                         && r.getRollName().equals("MEMBER")
                         && r.getMember().getId() == oldMember.getId())).isFalse();
-        System.out.println("AFTER");
-        for (ProjectRole projectRole : roleList) {
-            System.out.println(projectRole.getMember().getName() + " / "
-                    + projectRole.getTeam().getGroupName() + " / "
-                    + projectRole.getRollName());
-        }
-        for (Long id : memberList) {
+
+        for (Long id : newMemberList) {
             assertThat(roleList.stream()
                     .anyMatch(r -> r.getRollName().equals("MEMBER")
                             && r.getMember().getId() == id)).isTrue();
         }
         // team.roles.members 잘 제거되고 추가 되었는지
         ProjectTeam findUpdateTeam = projectTeamRepository.findById(updateProjectTeam.getId()).get();
-        List<Role> updateRoles = findUpdateTeam.getRoles();
-        assertThat(updateRoles.size()).isEqualTo(memberList.size());
+        List<Role> updateRoles = findUpdateTeam.getMemberRoles();
+        assertThat(updateRoles.size()).isEqualTo(newMemberList.size());
         assertThat(updateRoles.stream()
-                .anyMatch(r -> r.getMember().getId() == oldMember.getId())).isFalse();
+                .anyMatch(r -> r.getRollName().equals("MEMBER")
+                        && r.getMember().getId() == oldMember.getId())).isFalse();
         assertThat(updateRoles.stream()
-                .anyMatch(r -> r.getMember().getId() == newMember.getId())).isTrue();
+                .anyMatch(r -> r.getRollName().equals("MEMBER")
+                        && r.getMember().getId() == newMember.getId())).isTrue();
 
     }
 
