@@ -80,7 +80,7 @@ public class TagService {
     public void deleteTeamTagById(Long teamTagId) {
         Long tagId = teamTagRepository.findById(teamTagId).get().getTag().getId();
         teamTagRepository.deleteById(teamTagId);
-        if (!teamTagRepository.existsByTagId(teamTagId)) {
+        if (!teamTagRepository.existsByTagId(tagId)) {
             tagRepository.deleteById(tagId);
         }
     }
