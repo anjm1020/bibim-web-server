@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +26,9 @@ public class Team {
     @Column(name = "group_name")
     private String groupName;
 
+    @Builder.Default
     @Column(name = "period")
-    private String period;
+    private Integer period = LocalDate.now().getYear();
 
     @Column(name = "git_url")
     private String gitURL;
