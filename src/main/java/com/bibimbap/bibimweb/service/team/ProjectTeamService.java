@@ -2,7 +2,6 @@ package com.bibimbap.bibimweb.service.team;
 
 import com.bibimbap.bibimweb.domain.member.Member;
 import com.bibimbap.bibimweb.domain.role.ProjectRole;
-import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.domain.team.ProjectTeam;
 import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamCreateDto;
@@ -17,9 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,7 +37,7 @@ public class ProjectTeamService {
         return 0 <= pageNumber && pageNumber <= ((count - 1) / pageSize);
     }
 
-    public boolean isExistTeam(Long teamId) {
+    public boolean isNotExistTeam(Long teamId) {
         return projectTeamRepository.existsById(teamId);
     }
 
@@ -53,7 +50,6 @@ public class ProjectTeamService {
                 .content(dto.getContent())
                 .build();
 
-        newTeam.setPeriod(String.valueOf(LocalDate.now().getYear()));
         ProjectTeam saved = projectTeamRepository.save(newTeam);
 
         // project Role setting
@@ -81,8 +77,10 @@ public class ProjectTeamService {
         return makeResponseDto(saved);
     }
 
-    public List<ProjectTeamResponseDto> getProjectTeamList(Pageable pageable) {
+    public List<ProjectTeamResponseDto> getProjectTeamList(Pageable pageable, String year, String tag) {
         return projectTeamRepository.findAll(pageable).stream()
+                .filter(team -> year.equals("") || year.equals(String.valueOf(team.getPeriod())))
+                .filter(team -> tag.equals("") || team.getTags().stream().anyMatch(t -> t.getTag().getName().equals(tag)))
                 .map(o -> makeResponseDto(o))
                 .collect(Collectors.toList());
     }
@@ -137,12 +135,10 @@ public class ProjectTeamService {
             }
         }
 
-        List<ProjectRole> tmp = projectRoleRepository.findAllByTeamId(dto.getId());
-
         // find member to delete
         List<ProjectRole> teamMembers = projectRoleRepository.findAllByTeamIdAndRollName(dto.getId(), "MEMBER");
         for (ProjectRole pr : teamMembers) {
-            if (!members.stream().anyMatch(id -> pr.getMember().getId() == id)) {
+            if (members.stream().noneMatch(id -> pr.getMember().getId() == id)) {
                 pr.getMember().getRoles().remove(pr);
                 pr.getTeam().getMemberRoles().remove(pr);
                 projectRoleRepository.deleteById(pr.getId());
@@ -158,7 +154,7 @@ public class ProjectTeamService {
     public void deleteProjectTeam(Long teamId) {
         ProjectTeam projectTeam = projectTeamRepository.findById(teamId).get();
         // role 지워주기
-        projectTeam.getMemberRoles().stream()
+        projectTeam.getMemberRoles()
                 .forEach(pr -> {
                     pr.getMember().getRoles().remove(pr);
                     projectRoleRepository.deleteById(pr.getId());
@@ -174,6 +170,8 @@ public class ProjectTeamService {
                 .filter(r -> r.getRollName().equals("MEMBER"))
                 .map(r -> mapper.map(r.getMember(), MemberResponseDto.class))
                 .collect(Collectors.toList()));
+        List<String> tags = projectTeam.getTags().stream().map(tt -> tt.getTag().getName()).collect(Collectors.toList());
+        res.setTags(tags);
         return res;
     }
 }
