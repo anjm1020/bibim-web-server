@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter @SuperBuilder @ToString
+@Getter @Setter @Builder @ToString
 @NoArgsConstructor @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn
@@ -28,4 +28,6 @@ public class Member {
     @OneToMany(mappedBy = "member")
     @Builder.Default
     private List<Role> roles = new ArrayList<>();
+
+    
 }

@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.bibimbap.bibimweb.domain.member.Member;
-import com.bibimbap.bibimweb.domain.role.ProjectRole;
+import com.bibimbap.bibimweb.domain.role.team.ProjectRole;
 import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.dto.member.MemberCreateDto;
 import com.bibimbap.bibimweb.dto.member.MemberResponseDto;

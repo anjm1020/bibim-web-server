@@ -1,7 +1,7 @@
 package com.bibimbap.bibimweb.service.team;
 
 import com.bibimbap.bibimweb.domain.member.Member;
-import com.bibimbap.bibimweb.domain.role.ProjectRole;
+import com.bibimbap.bibimweb.domain.role.team.ProjectRole;
 import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.domain.team.ProjectTeam;
 import com.bibimbap.bibimweb.domain.team.tag.TeamTag;
@@ -15,9 +15,6 @@ import com.bibimbap.bibimweb.repository.team.ProjectTeamRepository;
 import com.bibimbap.bibimweb.repository.team.tag.TagRepository;
 import com.bibimbap.bibimweb.repository.team.tag.TeamTagRepository;
 import com.bibimbap.bibimweb.service.lib.MemberManager;
-import com.bibimbap.bibimweb.service.role.ProjectRoleService;
-import com.bibimbap.bibimweb.util.exception.OutOfRangeException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +26,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 

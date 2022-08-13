@@ -1,7 +1,7 @@
 package com.bibimbap.bibimweb.service.role;
 
 import com.bibimbap.bibimweb.domain.member.Member;
-import com.bibimbap.bibimweb.domain.role.ProjectRole;
+import com.bibimbap.bibimweb.domain.role.team.ProjectRole;
 import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.domain.team.ProjectTeam;
 import com.bibimbap.bibimweb.dto.role.project.ProjectRoleCreateDto;
@@ -9,10 +9,8 @@ import com.bibimbap.bibimweb.dto.role.project.ProjectRoleDto;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.ProjectRoleRepository;
 import com.bibimbap.bibimweb.repository.team.ProjectTeamRepository;
-import com.bibimbap.bibimweb.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +22,6 @@ public class ProjectRoleService {
     private final MemberRepository memberRepository;
     private final ProjectTeamRepository projectTeamRepository;
     private final ProjectRoleRepository projectRoleRepository;
-
 
     private final ModelMapper mapper = new ModelMapper();
 

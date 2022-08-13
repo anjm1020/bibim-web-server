@@ -1,6 +1,6 @@
 package com.bibimbap.bibimweb.repository.role;
 
-import com.bibimbap.bibimweb.domain.role.ProjectRole;
+import com.bibimbap.bibimweb.domain.role.team.ProjectRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

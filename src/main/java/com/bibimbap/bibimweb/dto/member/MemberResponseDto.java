@@ -1,10 +1,11 @@
 package com.bibimbap.bibimweb.dto.member;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor

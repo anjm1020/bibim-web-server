@@ -1,10 +1,9 @@
 package com.bibimbap.bibimweb.service.member;
 
 import com.bibimbap.bibimweb.domain.member.Member;
-import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.dto.member.*;
-import com.bibimbap.bibimweb.repository.member.AdminMemberRepository;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
+import com.bibimbap.bibimweb.repository.role.AdminRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final AdminMemberRepository adminMemberRepository;
+    private final AdminRoleRepository adminRoleRepository;
 
     private ModelMapper mapper = new ModelMapper();
 
@@ -45,19 +44,25 @@ public class MemberService {
 
     public MemberResponseDto getMemberById(Long memberId) {
         Member member = memberRepository.findById(memberId).get();
-        return mapper.map(member,MemberResponseDto.class);
+        return mapper.map(member, MemberResponseDto.class);
     }
 
     public List<MemberResponseDto> getMemberList(Pageable pageable) {
         return memberRepository.findAll(pageable)
                 .stream()
-                .map(o->mapper.map(o,MemberResponseDto.class))
+                .map(o -> mapper.map(o, MemberResponseDto.class))
                 .collect(Collectors.toList());
     }
 
     public List<AdminMemberResponseDto> getAdminMemberList() {
-        return adminMemberRepository.findAll().stream().
-                map(m -> mapper.map(m, AdminMemberResponseDto.class))
+        return adminRoleRepository.findAll().stream()
+                .map(role -> {
+                    Member member = role.getMember();
+                    AdminMemberResponseDto res = mapper.map(member, AdminMemberResponseDto.class);
+                    res.setPosition(role.getPosition());
+                    res.setPeriod(role.getPeriod());
+                    return res;
+                })
                 .collect(Collectors.toList());
     }
 

@@ -1,7 +1,7 @@
 package com.bibimbap.bibimweb.service.team;
 
 import com.bibimbap.bibimweb.domain.member.Member;
-import com.bibimbap.bibimweb.domain.role.ProjectRole;
+import com.bibimbap.bibimweb.domain.role.team.ProjectRole;
 import com.bibimbap.bibimweb.domain.team.ProjectTeam;
 import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamCreateDto;
@@ -15,7 +15,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 

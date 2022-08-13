@@ -1,6 +1,5 @@
 package com.bibimbap.bibimweb.controller.member;
 
-import com.bibimbap.bibimweb.domain.member.AdminMember;
 import com.bibimbap.bibimweb.dto.member.AdminMemberResponseDto;
 import com.bibimbap.bibimweb.dto.member.MemberCreateDto;
 import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
@@ -34,6 +33,7 @@ public class MemberController {
 
     @GetMapping("/")
     public List<MemberResponseDto> getListMember(Pageable pageable) {
+
         if (!memberService.isValidPage(pageable)) {
             throw OutOfRangeException.PAGE;
         }
