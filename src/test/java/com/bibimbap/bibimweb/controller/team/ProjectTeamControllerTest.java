@@ -1,4 +1,4 @@
-package com.bibimbap.bibimweb.controller;
+package com.bibimbap.bibimweb.controller.team;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

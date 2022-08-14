@@ -11,8 +11,6 @@ import java.util.List;
 @Entity
 @Getter @Setter @Builder @ToString
 @NoArgsConstructor @AllArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn
 public class Member {
     @Id
     @Column(name = "member_id")
