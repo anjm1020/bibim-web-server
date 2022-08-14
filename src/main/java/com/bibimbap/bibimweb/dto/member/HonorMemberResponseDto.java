@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminMemberResponseDto extends MemberResponseDto {
+public class HonorMemberResponseDto extends MemberResponseDto{
     private Integer period;
-    private String position;
+    private String groupName;
 }

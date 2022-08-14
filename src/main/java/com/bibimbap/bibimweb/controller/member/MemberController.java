@@ -1,9 +1,6 @@
 package com.bibimbap.bibimweb.controller.member;
 
-import com.bibimbap.bibimweb.dto.member.AdminMemberResponseDto;
-import com.bibimbap.bibimweb.dto.member.MemberCreateDto;
-import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
-import com.bibimbap.bibimweb.dto.member.MemberUpdateDto;
+import com.bibimbap.bibimweb.dto.member.*;
 import com.bibimbap.bibimweb.service.member.MemberService;
 import com.bibimbap.bibimweb.util.exception.ConflictException;
 import com.bibimbap.bibimweb.util.exception.NotFoundException;
@@ -32,7 +29,7 @@ public class MemberController {
     }
 
     @GetMapping("/")
-    public List<MemberResponseDto> getListMember(Pageable pageable) {
+    public List<MemberResponseDto> getMemberList(Pageable pageable) {
 
         if (!memberService.isValidPage(pageable)) {
             throw OutOfRangeException.PAGE;
@@ -41,12 +38,18 @@ public class MemberController {
     }
 
     @GetMapping(value = "/", params = "admin")
-    public List<AdminMemberResponseDto> getListAdminMember() {
+    public List<AdminMemberResponseDto> getAdminMemberList() {
         return memberService.getAdminMemberList();
+    }
+
+    @GetMapping(value = "/", params = "honor")
+    public List<HonorMemberResponseDto> getHonorMemberList() {
+        return memberService.getHonorMemberList();
     }
 
     @GetMapping("/{memberId}")
     public MemberResponseDto getMemberById(@PathVariable Long memberId) {
+
         if (!memberService.isExistMember(memberId)) {
             throw NotFoundException.MEMBER;
         }

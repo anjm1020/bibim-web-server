@@ -4,6 +4,8 @@ import com.bibimbap.bibimweb.domain.member.Member;
 import com.bibimbap.bibimweb.dto.member.*;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.AdminRoleRepository;
+import com.bibimbap.bibimweb.repository.role.HonorRoleRepository;
+import com.bibimbap.bibimweb.service.role.MemberRoleService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +20,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final AdminRoleRepository adminRoleRepository;
-
+    private final HonorRoleRepository honorRoleRepository;
     private ModelMapper mapper = new ModelMapper();
 
     public boolean isExistMember(Long id) {
@@ -61,6 +63,18 @@ public class MemberService {
                     AdminMemberResponseDto res = mapper.map(member, AdminMemberResponseDto.class);
                     res.setPosition(role.getPosition());
                     res.setPeriod(role.getPeriod());
+                    return res;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<HonorMemberResponseDto> getHonorMemberList() {
+        return honorRoleRepository.findAll().stream()
+                .map(role -> {
+                    Member member = role.getMember();
+                    HonorMemberResponseDto res = mapper.map(member, HonorMemberResponseDto.class);
+                    res.setPeriod(role.getPeriod());
+                    res.setGroupName(role.getGroupName());
                     return res;
                 })
                 .collect(Collectors.toList());
