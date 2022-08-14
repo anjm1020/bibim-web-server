@@ -91,8 +91,8 @@ public class ProjectTeamService {
     public ProjectTeamResponseDto updateProjectTeam(ProjectTeamUpdateDto dto) {
         ProjectTeam projectTeam = projectTeamRepository.findById(dto.getId()).get();
         projectTeam.setContent(dto.getContent());
-        // group name
         projectTeam.setGroupName(dto.getGroupName());
+
         // leader mapping
         Member leader = memberRepository.findById(dto.getLeaderId()).get();
         projectTeam.setLeader(leader);
@@ -133,7 +133,6 @@ public class ProjectTeamService {
                 memberRepository.save(curr);
             }
         }
-
         // find member to delete
         List<ProjectRole> teamMembers = projectRoleRepository.findAllByTeamIdAndRollName(dto.getId(), "MEMBER");
         for (ProjectRole pr : teamMembers) {
@@ -165,12 +164,7 @@ public class ProjectTeamService {
 
     public ProjectTeamResponseDto makeResponseDto(ProjectTeam projectTeam) {
         ProjectTeamResponseDto res = mapper.map(projectTeam, ProjectTeamResponseDto.class);
-        res.setMembers(projectTeam.getMemberRoles().stream()
-                .filter(r -> r.getRollName().equals("MEMBER"))
-                .map(r -> mapper.map(r.getMember(), MemberResponseDto.class))
-                .collect(Collectors.toList()));
-        List<String> tags = projectTeam.getTags().stream().map(tt -> tt.getTag().getName()).collect(Collectors.toList());
-        res.setTags(tags);
+        res.setMembersAndTags(projectTeam);
         return res;
     }
 }
