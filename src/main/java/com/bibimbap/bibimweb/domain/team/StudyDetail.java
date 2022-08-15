@@ -3,6 +3,7 @@ package com.bibimbap.bibimweb.domain.team;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -22,4 +23,8 @@ public class StudyDetail {
 
     @Column(name = "content")
     private String content;
+
+    @Column(name = "createAt")
+    @Builder.Default
+    private LocalDate createAt = LocalDate.now();
 }
