@@ -1,22 +1,18 @@
 package com.bibimbap.bibimweb.dto.team.project;
 
+import com.bibimbap.bibimweb.dto.team.TeamCreateDto;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectTeamCreateDto {
-    private String groupName;
-    private Long leaderId;
+public class ProjectTeamCreateDto extends TeamCreateDto {
     private String content;
-    @Builder.Default
-    private List<Long> members = new ArrayList<>();
-    @Builder.Default
-    private List<String> tags = new ArrayList<>();
 }

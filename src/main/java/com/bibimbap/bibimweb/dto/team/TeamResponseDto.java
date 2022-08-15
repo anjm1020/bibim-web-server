@@ -23,6 +23,7 @@ public class TeamResponseDto {
     private String gitURL;
     private String blogURL;
 
+    private MemberResponseDto leader;
     @Builder.Default
     private List<MemberResponseDto> members = new ArrayList<>();
     @Builder.Default

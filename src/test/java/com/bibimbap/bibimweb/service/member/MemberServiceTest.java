@@ -6,6 +6,7 @@ import com.bibimbap.bibimweb.domain.role.member.AdminRole;
 import com.bibimbap.bibimweb.dto.member.AdminMemberResponseDto;
 import com.bibimbap.bibimweb.dto.member.MemberCreateDto;
 import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
+import com.bibimbap.bibimweb.dto.member.MemberUpdateDto;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.AdminRoleRepository;
 import com.bibimbap.bibimweb.service.lib.MemberManager;
@@ -76,14 +77,63 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("운영진 삭제 테스트")
-    void deleteAdmin() {
+    @DisplayName("명예회원 생성 테스트")
+    void createHonor() {
 
     }
 
     @Test
-    @DisplayName("명예회원 생성 테스트")
-    void createHonor() {
+    @DisplayName("회원 일반 필드 수정 테스트")
+    void updateNormField() {
+        String studentId = "111";
+        MemberResponseDto memberBefore = memberManager.createMember("memberBefore", studentId);
+
+        String newName = "memberNew";
+        MemberResponseDto after = memberService.updateMember(MemberUpdateDto.builder()
+                .id(memberBefore.getId())
+                .name(newName)
+                .studentId(studentId)
+                .build());
+
+        Member findMember = memberRepository.findById(after.getId()).get();
+        assertThat(findMember.getId()).isEqualTo(after.getId());
+        assertThat(findMember.getName()).isEqualTo(newName);
+        assertThat(findMember.getStudentId()).isEqualTo(studentId);
+    }
+
+    @Test
+    @DisplayName("운영진 필드 수정 테스트")
+    void updateAdminField() {
+        String memberName = "member";
+        String studentId = "111";
+        MemberResponseDto member = memberManager.createMember(memberName, studentId);
+        String position = "운영진";
+        memberRoleService.addAdminRole(member.getId(), position);
+
+        String newPosition = "회장";
+        memberRoleService.updateAdminRole(member.getId(), newPosition);
+
+        Member findMember = memberRepository.findById(member.getId()).get();
+        assertThat(findMember.getRoles().stream()
+                .anyMatch(role -> role instanceof AdminRole
+                        && ((AdminRole) role).getPosition().equals(newPosition))).isTrue();
+    }
+
+    @Test
+    @DisplayName("명예회원 필드 수정 테스트")
+    void updateHonorField() {
+
+    }
+
+    @Test
+    @DisplayName("일반회원 삭제 테스트")
+    void deleteMember() {
+
+    }
+
+    @Test
+    @DisplayName("운영진 삭제 테스트")
+    void deleteAdmin() {
 
     }
 
@@ -94,10 +144,23 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원 일반 필드 수정 테스트")
-    void updateNormField() {
+    @DisplayName("회원 삭제 시 Role 제대로 업데이트 되는지 테스트")
+    void checkRoleTableAfterDelete() {
 
     }
+
+    @Test
+    @DisplayName("운영진 삭제 시 Role 제대로 업데이트 되는지 테스트")
+    void checkRoleTableAfterDeleteAdmin() {
+
+    }
+
+    @Test
+    @DisplayName("명예회원 삭제 시 Role 제대로 업데이트 되는지 테스트")
+    void checkRoleTableAfterDeleteHonor() {
+
+    }
+
 
     @Test
     @DisplayName("회원 리스트 - 페이지네이션 테스트")
@@ -130,19 +193,11 @@ class MemberServiceTest {
             System.out.println(adminMemberResponseDto);
         }
         assertThat(list.size()).isEqualTo(2);
-
-
     }
 
     @Test
     @DisplayName("명예회원 리스트 - 년도별, 전체 테스트")
     void getHonorList() {
-
-    }
-
-    @Test
-    @DisplayName("회원 삭제 시 Role 제대로 업데이트 되는지 테스트")
-    void checkRoleTableAfterDelete() {
 
     }
 
