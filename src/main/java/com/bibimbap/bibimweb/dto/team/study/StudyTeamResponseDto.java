@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudyTeamResponseDto extends TeamResponseDto {

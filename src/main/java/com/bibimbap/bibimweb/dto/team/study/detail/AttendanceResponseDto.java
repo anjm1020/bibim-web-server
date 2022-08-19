@@ -1,7 +1,6 @@
 package com.bibimbap.bibimweb.dto.team.study.detail;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
@@ -9,7 +8,8 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Attendance {
+public class AttendanceResponseDto {
     private String memberName;
+    private Integer groupNumber;
     private Boolean isAttend;
 }

@@ -27,4 +27,8 @@ public class StudyDetail {
     @Column(name = "createAt")
     @Builder.Default
     private LocalDate createAt = LocalDate.now();
+
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private StudyTeam studyTeam;
 }

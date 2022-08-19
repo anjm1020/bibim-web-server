@@ -2,16 +2,14 @@ package com.bibimbap.bibimweb.dto.team.study.detail;
 
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudyDetailResponseDto {
-    private String content;
+public class StudyDetailUpdateDto {
+    private Long detailId;
     private Integer week;
-    private List<AttendanceResponseDto> attendances;
+    private String detail;
 }

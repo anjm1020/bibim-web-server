@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 public class TeamRoleService {
     private final ProjectRoleRepository projectRoleRepository;
     private final StudyRoleRepository studyRoleRepository;
-
     public void addProjectRole(Team team, Member member, RoleName roleName, String field) {
         ProjectRole saved = projectRoleRepository.save(ProjectRole.builder()
                 .team(team)

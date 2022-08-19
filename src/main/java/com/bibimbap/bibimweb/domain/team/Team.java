@@ -3,6 +3,7 @@ package com.bibimbap.bibimweb.domain.team;
 import com.bibimbap.bibimweb.domain.member.Member;
 import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.domain.team.tag.TeamTag;
+import com.bibimbap.bibimweb.dto.team.TeamUpdateDto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -47,4 +48,10 @@ public class Team {
     @Builder.Default
     @OneToMany(mappedBy = "team")
     private List<TeamTag> tags = new ArrayList<>();
+
+    public void update(TeamUpdateDto dto) {
+        this.groupName = dto.getGroupName();
+        this.gitURL = dto.getGitURL();
+        this.blogURL = dto.getBlogURL();
+    }
 }

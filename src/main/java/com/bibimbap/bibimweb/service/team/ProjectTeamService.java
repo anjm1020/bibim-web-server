@@ -4,14 +4,12 @@ import com.bibimbap.bibimweb.domain.member.Member;
 import com.bibimbap.bibimweb.domain.role.RoleName;
 import com.bibimbap.bibimweb.domain.role.team.ProjectRole;
 import com.bibimbap.bibimweb.domain.team.ProjectTeam;
-import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamCreateDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamResponseDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamUpdateDto;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.ProjectRoleRepository;
-import com.bibimbap.bibimweb.repository.team.ProjectTeamRepository;
-import com.bibimbap.bibimweb.service.role.MemberRoleService;
+import com.bibimbap.bibimweb.repository.team.project.ProjectTeamRepository;
 import com.bibimbap.bibimweb.service.role.TeamRoleService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -82,14 +80,12 @@ public class ProjectTeamService {
 
     public ProjectTeamResponseDto updateProjectTeam(ProjectTeamUpdateDto dto) {
         ProjectTeam projectTeam = projectTeamRepository.findById(dto.getId()).get();
-        projectTeam.setContent(dto.getContent());
-        projectTeam.setGroupName(dto.getGroupName());
+        projectTeam.update(dto);
 
         // leader mapping
         Member leader = memberRepository.findById(dto.getLeaderId()).get();
         projectTeam.setLeader(leader);
         Optional<ProjectRole> leaderRole = projectRoleRepository.findByTeamIdAndRollName(dto.getId(), "LEADER");
-        ProjectRole savedLeaderRole;
         if (leaderRole.isEmpty()) {
             teamRoleService.addProjectRole(projectTeam, leader, RoleName.LEADER, "");
         } else {
@@ -101,9 +97,7 @@ public class ProjectTeamService {
         List<Long> members = dto.getMembers();
         for (Long id : members) {
             Member curr = memberRepository.findById(id).get();
-            Optional<ProjectRole> memberRole = projectRoleRepository.findByTeamIdAndRollNameAndMemberId(dto.getId(), "MEMBER", id);
-            ProjectRole savedMemberRole;
-            if (memberRole.isEmpty()) {
+            if (projectRoleRepository.findByTeamIdAndRollNameAndMemberId(dto.getId(), "MEMBER", id).isEmpty()) {
                 // 신규 멤버
                 teamRoleService.addProjectRole(projectTeam, curr, RoleName.MEMBER, "");
             }

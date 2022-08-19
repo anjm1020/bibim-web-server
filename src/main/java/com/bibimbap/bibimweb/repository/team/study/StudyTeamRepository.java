@@ -1,4 +1,4 @@
-package com.bibimbap.bibimweb.repository.team;
+package com.bibimbap.bibimweb.repository.team.study;
 
 import com.bibimbap.bibimweb.domain.team.StudyTeam;
 import org.springframework.data.jpa.repository.JpaRepository;

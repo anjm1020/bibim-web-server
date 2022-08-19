@@ -1,5 +1,7 @@
 package com.bibimbap.bibimweb.domain.team;
 
+import com.bibimbap.bibimweb.dto.team.TeamUpdateDto;
+import com.bibimbap.bibimweb.dto.team.project.ProjectTeamUpdateDto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -14,4 +16,10 @@ import javax.persistence.Entity;
 public class ProjectTeam extends Team {
     @Column(name = "content")
     private String content;
+
+    @Override
+    public void update(TeamUpdateDto dto) {
+        super.update(dto);
+        this.content = ((ProjectTeamUpdateDto) dto).getContent();
+    }
 }
