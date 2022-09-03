@@ -3,8 +3,8 @@ package com.bibimbap.bibimweb.test;
 import com.bibimbap.bibimweb.domain.member.Member;
 import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.domain.role.member.AdminRole;
+import com.bibimbap.bibimweb.dto.member.AdminMemberDto;
 import com.bibimbap.bibimweb.dto.member.AdminMemberResponseDto;
-import com.bibimbap.bibimweb.dto.member.HonorMemberResponseDto;
 import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.AdminRoleRepository;
@@ -12,7 +12,6 @@ import com.bibimbap.bibimweb.repository.role.HonorRoleRepository;
 import com.bibimbap.bibimweb.service.lib.MemberManager;
 import com.bibimbap.bibimweb.service.member.MemberService;
 import com.bibimbap.bibimweb.service.role.MemberRoleService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,10 @@ public class TemporaryTest {
 
         // WHEN : 운영진 role 추가
         String positionA = "운영진";
-            memberRoleService.addAdminRole(memberADto.getId(), positionA);
+        memberRoleService.addAdminRole(AdminMemberDto.builder()
+                .memberId(memberADto.getId())
+                .position(positionA)
+                .build());
 
         // THEN
         Member findMemberA = memberRepository.findById(memberADto.getId()).get();
@@ -63,12 +65,17 @@ public class TemporaryTest {
         MemberResponseDto memberBDto = memberManager.createMember(nameB, idB);
 
         String positionB = "총무";
-        memberRoleService.addAdminRole(memberBDto.getId(), positionB);
+        memberRoleService.addAdminRole(AdminMemberDto.builder()
+                .memberId(memberBDto.getId())
+                .position(positionB)
+                .build());
 
         String positionAUpdated = "부회장";
         // WHEN : 운영진A 수정
-        memberRoleService.updateAdminRole(memberADto.getId(), positionAUpdated);
-
+        memberRoleService.updateAdminRole(AdminMemberDto.builder()
+                .memberId(memberADto.getId())
+                .position(positionAUpdated)
+                .build());
         // THEN
         Member findUpdatedA = memberRepository.findById(memberADto.getId()).get();
         List<Role> updatedRoles = findUpdatedA.getRoles();

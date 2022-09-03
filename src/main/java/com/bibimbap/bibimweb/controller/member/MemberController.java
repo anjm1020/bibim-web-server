@@ -2,6 +2,7 @@ package com.bibimbap.bibimweb.controller.member;
 
 import com.bibimbap.bibimweb.dto.member.*;
 import com.bibimbap.bibimweb.service.member.MemberService;
+import com.bibimbap.bibimweb.service.role.MemberRoleService;
 import com.bibimbap.bibimweb.util.exception.ConflictException;
 import com.bibimbap.bibimweb.util.exception.NotFoundException;
 import com.bibimbap.bibimweb.util.exception.OutOfRangeException;
@@ -19,6 +20,7 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberRoleService memberRoleService;
 
     @PostMapping("/")
     public MemberResponseDto createMember(@RequestBody MemberCreateDto member) {
@@ -26,6 +28,22 @@ public class MemberController {
             throw ConflictException.MEMBER;
         }
         return memberService.createMember(member);
+    }
+
+    @PostMapping("/admin/")
+    public AdminMemberResponseDto createAdminMember(@RequestBody AdminMemberDto dto) {
+        if (!memberService.isExistMember(dto.getMemberId())) {
+            throw NotFoundException.MEMBER;
+        }
+        return memberRoleService.addAdminRole(dto);
+    }
+
+    @PostMapping("/honor/")
+    public HonorMemberResponseDto createHonorMember(@RequestBody HonorMemberDto dto) {
+        if (!memberService.isExistMember(dto.getMemberId())) {
+            throw NotFoundException.MEMBER;
+        }
+        return memberRoleService.addHonorRole(dto);
     }
 
     @GetMapping("/")
@@ -37,12 +55,12 @@ public class MemberController {
         return memberService.getMemberList(pageable);
     }
 
-    @GetMapping(value = "/", params = "admin")
+    @GetMapping("/admin/")
     public List<AdminMemberResponseDto> getAdminMemberList() {
         return memberService.getAdminMemberList();
     }
 
-    @GetMapping(value = "/", params = "honor")
+    @GetMapping("/honor/")
     public List<HonorMemberResponseDto> getHonorMemberList() {
         return memberService.getHonorMemberList();
     }
@@ -64,12 +82,45 @@ public class MemberController {
         return memberService.updateMember(member);
     }
 
+    @PutMapping("/admin/")
+    public AdminMemberResponseDto updateAdminMember(@RequestBody AdminMemberDto dto) {
+        if (!memberService.isExistMember(dto.getMemberId())) {
+            throw NotFoundException.MEMBER;
+        }
+        return memberRoleService.updateAdminRole(dto);
+    }
+    @PutMapping("/honor/")
+    public HonorMemberResponseDto updateHonorMember(@RequestBody HonorMemberDto dto) {
+        if (!memberService.isExistMember(dto.getMemberId())) {
+            throw NotFoundException.MEMBER;
+        }
+        return memberRoleService.updateHonorRole(dto);
+    }
+
     @DeleteMapping("/{memberId}")
     public ResponseEntity deleteMember(@PathVariable Long memberId) {
         if (!memberService.isExistMember(memberId)) {
             throw NotFoundException.MEMBER;
         }
         memberService.deleteMember(memberId);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/admin/{memberId}")
+    public ResponseEntity deleteAdminMember(@PathVariable Long memberId) {
+        if (!memberService.isExistMember(memberId)) {
+            throw NotFoundException.MEMBER;
+        }
+        memberRoleService.deleteAdminRole(memberId);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/honor/{memberId}")
+    public ResponseEntity deleteHonorMember(@PathVariable Long memberId, @RequestParam String groupName) {
+        if (!memberService.isExistMember(memberId)) {
+            throw NotFoundException.MEMBER;
+        }
+        memberRoleService.deleteHonorRole(memberId, groupName);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

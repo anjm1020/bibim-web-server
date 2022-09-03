@@ -11,7 +11,7 @@ import com.bibimbap.bibimweb.dto.team.project.ProjectTeamResponseDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamUpdateDto;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.ProjectRoleRepository;
-import com.bibimbap.bibimweb.repository.team.ProjectTeamRepository;
+import com.bibimbap.bibimweb.repository.team.project.ProjectTeamRepository;
 import com.bibimbap.bibimweb.repository.team.tag.TagRepository;
 import com.bibimbap.bibimweb.repository.team.tag.TeamTagRepository;
 import com.bibimbap.bibimweb.service.lib.MemberManager;

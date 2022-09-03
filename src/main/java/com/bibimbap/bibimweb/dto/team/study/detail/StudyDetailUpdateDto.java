@@ -2,6 +2,8 @@ package com.bibimbap.bibimweb.dto.team.study.detail;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -9,7 +11,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudyDetailUpdateDto {
-    private Long detailId;
+    private Long detail_id;
     private Integer week;
-    private String detail;
+    private String content;
+    private List<AttendanceManageDto> attendances;
 }

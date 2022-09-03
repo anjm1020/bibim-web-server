@@ -12,6 +12,7 @@ import com.bibimbap.bibimweb.dto.team.study.StudyTeamUpdateDto;
 import com.bibimbap.bibimweb.dto.team.study.detail.AttendanceResponseDto;
 import com.bibimbap.bibimweb.dto.team.study.detail.StudyDetailCreateDto;
 import com.bibimbap.bibimweb.dto.team.study.detail.StudyDetailResponseDto;
+import com.bibimbap.bibimweb.dto.team.study.detail.StudyDetailUpdateDto;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.StudyRoleRepository;
 import com.bibimbap.bibimweb.repository.team.study.StudyDetailRepository;
@@ -125,7 +126,6 @@ public class StudyTeamService {
 
         dto.getAttendances().stream()
                 .forEach(attendance -> {
-                    System.out.println("memberId : " + attendance.getMemberId() + " / week :" + attendance.getWeek());
                     StudyRole studyRole = studyRoleRepository.findByTeamIdAndRollNameAndMemberId(dto.getTeamId(), RoleName.MEMBER.name(), attendance.getMemberId()).get();
                     List<Boolean> attendanceList = toAttendanceList(studyRole.getAttendance());
                     if (attendance.getWeek() >= attendanceList.size()) {
@@ -136,11 +136,30 @@ public class StudyTeamService {
                     }
 
                     studyRole.setAttendance(toAttendanceString(attendanceList));
-                    System.out.println(toAttendanceString(attendanceList)+" : "+studyRole.getMember().getName()+" , "+attendance.getWeek());
                     studyRoleRepository.save(studyRole);
                 });
 
         return makeResponseDto(studyTeam);
+    }
+
+    public StudyTeamResponseDto updateStudyDetail(StudyDetailUpdateDto dto) {
+        StudyDetail detail = studyDetailRepository.findById(dto.getDetail_id()).get();
+        detail.setWeek(detail.getWeek());
+        detail.setContent(detail.getContent());
+
+        dto.getAttendances().stream()
+                .forEach(attendance -> {
+                    StudyRole studyRole = studyRoleRepository.findByTeamIdAndRollNameAndMemberId(detail.getStudyTeam().getId(), RoleName.MEMBER.name(), attendance.getMemberId()).get();
+                    List<Boolean> attendanceList = toAttendanceList(studyRole.getAttendance());
+
+                    attendanceList.set(attendance.getWeek() - 1, attendance.isAttend());
+
+                    studyRole.setAttendance(toAttendanceString(attendanceList));
+                    studyRoleRepository.save(studyRole);
+                });
+
+        StudyDetail saved = studyDetailRepository.save(detail);
+        return makeResponseDto(saved.getStudyTeam());
     }
 
     private StudyTeamResponseDto makeResponseDto(StudyTeam studyTeam) {

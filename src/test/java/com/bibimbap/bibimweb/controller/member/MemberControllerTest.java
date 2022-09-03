@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.bibimbap.bibimweb.dto.member.AdminMemberDto;
 import com.bibimbap.bibimweb.dto.member.AdminMemberResponseDto;
 import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
 import com.bibimbap.bibimweb.service.lib.MemberManager;
 import com.bibimbap.bibimweb.service.role.MemberRoleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +43,14 @@ public class MemberControllerTest {
         MemberResponseDto member2 = memberManager.createMember("name2", "222");
         MemberResponseDto member3 = memberManager.createMember("name3", "333");
 
-        memberRoleService.addAdminRole(member.getId(), "회장");
-        memberRoleService.addAdminRole(member2.getId(), "부회장");
+        memberRoleService.addAdminRole(AdminMemberDto.builder()
+                .memberId(member.getId())
+                .position("회장")
+                .build());
+        memberRoleService.addAdminRole(AdminMemberDto.builder()
+                .memberId(member2.getId())
+                .position("부회장")
+                .build());
 
         String content = mockMvc.perform(get("/members/?admin="))
                 .andExpect(status().isOk())

@@ -23,6 +23,15 @@ public class Member {
     @Column(name = "student_id")
     private String studentId;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "git_url")
+    private String gitUrl;
+
     @OneToMany(mappedBy = "member")
     @Builder.Default
     private List<Role> roles = new ArrayList<>();

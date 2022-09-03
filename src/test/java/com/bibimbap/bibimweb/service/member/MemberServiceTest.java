@@ -3,10 +3,7 @@ package com.bibimbap.bibimweb.service.member;
 import com.bibimbap.bibimweb.domain.member.Member;
 import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.domain.role.member.AdminRole;
-import com.bibimbap.bibimweb.dto.member.AdminMemberResponseDto;
-import com.bibimbap.bibimweb.dto.member.MemberCreateDto;
-import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
-import com.bibimbap.bibimweb.dto.member.MemberUpdateDto;
+import com.bibimbap.bibimweb.dto.member.*;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.AdminRoleRepository;
 import com.bibimbap.bibimweb.service.lib.MemberManager;
@@ -63,7 +60,10 @@ class MemberServiceTest {
         MemberResponseDto saved = memberManager.createMember(name, studentId);
 
         String position = "부회장";
-        memberRoleService.addAdminRole(saved.getId(), position);
+        memberRoleService.addAdminRole(AdminMemberDto.builder()
+                .memberId(saved.getId())
+                .position(position)
+                .build());
         Member member = memberRepository.findById(saved.getId()).get();
         Optional<Role> adminRole = member.getRoles().stream().filter(role -> role.getRollName().equals("ADMIN")).findAny();
         assertThat(adminRole.isPresent()).isTrue();
@@ -108,10 +108,16 @@ class MemberServiceTest {
         String studentId = "111";
         MemberResponseDto member = memberManager.createMember(memberName, studentId);
         String position = "운영진";
-        memberRoleService.addAdminRole(member.getId(), position);
+        memberRoleService.addAdminRole(AdminMemberDto.builder()
+                .memberId(member.getId())
+                .position(position)
+                .build());
 
         String newPosition = "회장";
-        memberRoleService.updateAdminRole(member.getId(), newPosition);
+        memberRoleService.updateAdminRole(AdminMemberDto.builder()
+                .memberId(member.getId())
+                .position(position)
+                .build());
 
         Member findMember = memberRepository.findById(member.getId()).get();
         assertThat(findMember.getRoles().stream()
@@ -176,8 +182,14 @@ class MemberServiceTest {
         MemberResponseDto memberA = memberManager.createMember(nameA, "1");
         MemberResponseDto memberB = memberManager.createMember(nameB, "2");
 
-        memberRoleService.addAdminRole(memberA.getId(), "회장");
-        memberRoleService.addAdminRole(memberB.getId(), "부회장");
+        memberRoleService.addAdminRole(AdminMemberDto.builder()
+                .memberId(memberA.getId())
+                .position("회장")
+                .build());
+        memberRoleService.addAdminRole(AdminMemberDto.builder()
+                .memberId(memberB.getId())
+                .position("부회장")
+                .build());
 
         for (AdminRole adminRole : adminRoleRepository.findAll()) {
             System.out.println(adminRole.getMember().getName() + "/" + adminRole.getPosition() + "/" + adminRole.getPeriod());

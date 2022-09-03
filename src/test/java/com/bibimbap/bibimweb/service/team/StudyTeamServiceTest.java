@@ -3,7 +3,7 @@ package com.bibimbap.bibimweb.service.team;
 import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
 import com.bibimbap.bibimweb.dto.team.study.StudyTeamCreateDto;
 import com.bibimbap.bibimweb.dto.team.study.StudyTeamResponseDto;
-import com.bibimbap.bibimweb.dto.team.study.detail.AttendanceCreateDto;
+import com.bibimbap.bibimweb.dto.team.study.detail.AttendanceManageDto;
 import com.bibimbap.bibimweb.dto.team.study.detail.StudyDetailCreateDto;
 import com.bibimbap.bibimweb.repository.team.study.StudyTeamRepository;
 import com.bibimbap.bibimweb.service.lib.MemberManager;
@@ -75,8 +75,8 @@ public class StudyTeamServiceTest {
                 .groupNumbers(groupMapping)
                 .build());
 
-        List<AttendanceCreateDto> attendances = new ArrayList<>();
-        members.forEach(memberId -> attendances.add(AttendanceCreateDto.builder()
+        List<AttendanceManageDto> attendances = new ArrayList<>();
+        members.forEach(memberId -> attendances.add(AttendanceManageDto.builder()
                 .week(1)
                 .memberId(memberId)
                 .isAttend(true)
@@ -90,8 +90,8 @@ public class StudyTeamServiceTest {
                 .attendances(attendances)
                 .build());
 
-        List<AttendanceCreateDto> attendances2 = new ArrayList<>();
-        members.forEach(memberId -> attendances2.add(AttendanceCreateDto.builder()
+        List<AttendanceManageDto> attendances2 = new ArrayList<>();
+        members.forEach(memberId -> attendances2.add(AttendanceManageDto.builder()
                 .week(2)
                 .memberId(memberId)
                 .isAttend(false)

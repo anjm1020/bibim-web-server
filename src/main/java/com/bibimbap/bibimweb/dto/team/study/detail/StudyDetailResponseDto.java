@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudyDetailResponseDto {
+    private Long id;
     private String content;
     private Integer week;
     private List<AttendanceResponseDto> attendances;

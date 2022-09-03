@@ -15,6 +15,6 @@ public class StudyDetailCreateDto {
     private Integer week;
     private String content;
     // Attendance 를 넣어야해
-    private List<AttendanceCreateDto> attendances;
+    private List<AttendanceManageDto> attendances;
     // copy that
 }

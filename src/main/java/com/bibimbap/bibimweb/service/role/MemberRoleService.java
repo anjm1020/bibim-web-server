@@ -4,10 +4,15 @@ import com.bibimbap.bibimweb.domain.member.Member;
 import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.domain.role.member.AdminRole;
 import com.bibimbap.bibimweb.domain.role.member.HonorRole;
+import com.bibimbap.bibimweb.dto.member.AdminMemberDto;
+import com.bibimbap.bibimweb.dto.member.AdminMemberResponseDto;
+import com.bibimbap.bibimweb.dto.member.HonorMemberDto;
+import com.bibimbap.bibimweb.dto.member.HonorMemberResponseDto;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.AdminRoleRepository;
 import com.bibimbap.bibimweb.repository.role.HonorRoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,7 +23,10 @@ public class MemberRoleService {
     private final AdminRoleRepository adminRoleRepository;
     private final HonorRoleRepository honorRoleRepository;
 
-    public void addAdminRole(Long memberId, String position) {
+    private final ModelMapper mapper = new ModelMapper();
+    public AdminMemberResponseDto addAdminRole(AdminMemberDto dto) {
+        Long memberId = dto.getMemberId();
+        String position = dto.getPosition();
         Member member = memberRepository.findById(memberId).get();
         AdminRole saved = adminRoleRepository.save(AdminRole.builder()
                 .rollName("ADMIN")
@@ -27,9 +35,15 @@ public class MemberRoleService {
                 .team(null)
                 .build());
         member.getRoles().add(saved);
+        AdminMemberResponseDto res = mapper.map(member, AdminMemberResponseDto.class);
+        res.setPosition(saved.getPosition());
+        res.setPeriod(saved.getPeriod());
+        return res;
     }
 
-    public void addHonorRole(Long memberId, String groupName) {
+    public HonorMemberResponseDto addHonorRole(HonorMemberDto dto) {
+        Long memberId = dto.getMemberId();
+        String groupName = dto.getGroupName();
         Member member = memberRepository.findById(memberId).get();
         HonorRole saved = honorRoleRepository.save(HonorRole.builder()
                 .rollName("HONOR")
@@ -38,9 +52,15 @@ public class MemberRoleService {
                 .team(null)
                 .build());
         member.getRoles().add(saved);
+        HonorMemberResponseDto res = mapper.map(member, HonorMemberResponseDto.class);
+        res.setGroupName(saved.getGroupName());
+        res.setPeriod(saved.getPeriod());
+        return res;
     }
 
-    public void updateAdminRole(Long memberId, String position) {
+    public AdminMemberResponseDto updateAdminRole(AdminMemberDto dto) {
+        Long memberId = dto.getMemberId();
+        String position = dto.getPosition();
         Member member = memberRepository.findById(memberId).get();
         AdminRole adminRole = member.getRoles().stream()
                 .filter(role -> role instanceof AdminRole)
@@ -48,9 +68,15 @@ public class MemberRoleService {
                 .findAny().get();
         adminRole.setPosition(position);
         adminRoleRepository.save(adminRole);
+        AdminMemberResponseDto res = mapper.map(member, AdminMemberResponseDto.class);
+        res.setPosition(adminRole.getPosition());
+        res.setPeriod(adminRole.getPeriod());
+        return res;
     }
 
-    public void updateHonorRole(Long memberId, String groupName) {
+    public HonorMemberResponseDto updateHonorRole(HonorMemberDto dto) {
+        Long memberId = dto.getMemberId();
+        String groupName = dto.getGroupName();
         Member member = memberRepository.findById(memberId).get();
         HonorRole honorRole = member.getRoles().stream()
                 .filter(role -> role instanceof HonorRole)
@@ -58,6 +84,10 @@ public class MemberRoleService {
                 .findAny().get();
         honorRole.setGroupName(groupName);
         honorRoleRepository.save(honorRole);
+        HonorMemberResponseDto res = mapper.map(member, HonorMemberResponseDto.class);
+        res.setGroupName(honorRole.getGroupName());
+        res.setPeriod(honorRole.getPeriod());
+        return res;
     }
 
     public void deleteAdminRole(Long memberId) {

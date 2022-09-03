@@ -8,7 +8,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendanceCreateDto {
+public class AttendanceManageDto {
     private Long memberId;
     private Integer week;
     private boolean isAttend;
