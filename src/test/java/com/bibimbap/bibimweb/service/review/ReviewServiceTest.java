@@ -83,12 +83,12 @@ public class ReviewServiceTest {
         assertThat(reviewList3.stream().anyMatch(review -> review.getId().equals(saved2.getId()))).isTrue();
 
         String updatedContent = "UpdatedContent";
-        reviewService.updateReview(ReviewUpdateDto.builder()
+        System.out.println(reviewService.updateReview(ReviewUpdateDto.builder()
                 .id(saved.getId())
                 .content(updatedContent)
                 .memberId(saved.getMember().getId())
                 .teamId(saved.getTeam().getId())
-                .build());
+                .build()));
         Review findUpdated = reviewRepository.findById(saved.getId()).get();
         assertThat(findUpdated.getContent()).isEqualTo(updatedContent);
         assertThat(findUpdated.getMember().getId()).isEqualTo(saved.getMember().getId());

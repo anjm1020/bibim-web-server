@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
+
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
@@ -52,11 +53,12 @@ public class MemberControllerTest {
                 .position("부회장")
                 .build());
 
-        String content = mockMvc.perform(get("/members/?admin="))
+        String content = mockMvc.perform(get("/members/admin/"))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn().getResponse().getContentAsString();
 
+        System.out.println(content);
         AdminMemberResponseDto[] list = objectMapper.readValue(content, AdminMemberResponseDto[].class);
         assertThat(Arrays.stream(list)
                 .anyMatch(dto -> dto.getId().equals(member.getId())

@@ -4,6 +4,7 @@ import com.bibimbap.bibimweb.domain.team.Team;
 import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import net.bytebuddy.implementation.bind.annotation.Super;
 import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;

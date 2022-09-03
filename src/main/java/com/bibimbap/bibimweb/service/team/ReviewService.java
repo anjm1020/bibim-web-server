@@ -38,6 +38,10 @@ public class ReviewService {
         return mapper.map(saved, ReviewResponseDto.class);
     }
 
+    public ReviewResponseDto getReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).get();
+        return mapper.map(review, ReviewResponseDto.class);
+    }
     public List<ReviewResponseDto> getReviewList(Pageable pageable, Integer period) {
         if (period == null) {
             return reviewRepository.findAll(pageable).stream()
