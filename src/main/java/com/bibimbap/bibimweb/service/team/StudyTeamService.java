@@ -2,7 +2,6 @@ package com.bibimbap.bibimweb.service.team;
 
 import com.bibimbap.bibimweb.domain.member.Member;
 import com.bibimbap.bibimweb.domain.role.RoleName;
-import com.bibimbap.bibimweb.domain.role.team.ProjectRole;
 import com.bibimbap.bibimweb.domain.role.team.StudyRole;
 import com.bibimbap.bibimweb.domain.team.StudyDetail;
 import com.bibimbap.bibimweb.domain.team.StudyTeam;
@@ -48,7 +47,7 @@ public class StudyTeamService {
     }
 
     public boolean isNotExistTeam(Long teamId) {
-        return studyTeamRepository.existsById(teamId);
+        return !studyTeamRepository.existsById(teamId);
     }
 
     public StudyTeamResponseDto createStudyTeam(StudyTeamCreateDto dto) {
@@ -77,6 +76,18 @@ public class StudyTeamService {
 
     public StudyTeamResponseDto getStudyTeamById(Long teamId) {
         return makeResponseDto(studyTeamRepository.findById(teamId).get());
+    }
+
+    public List<StudyTeamResponseDto> getStudyTeamList(Pageable pageable, String year, String tag) {
+        return studyTeamRepository.findAll(pageable).stream()
+                .filter(team -> year.equals("") || year.equals(String.valueOf(team.getPeriod())))
+                .filter(team -> tag.equals("") || team.getTags().stream().anyMatch(t -> t.getTag().getName().equals(tag)))
+                .map(o -> makeResponseDto(o))
+                .collect(Collectors.toList());
+    }
+
+    public StudyDetailResponseDto getStudyDetailById(Long detailId) {
+        return makeDetailResponseDto(studyDetailRepository.findById(detailId).get());
     }
 
     public StudyTeamResponseDto updateStudyTeam(StudyTeamUpdateDto dto) {
@@ -109,13 +120,18 @@ public class StudyTeamService {
             }
         }
 
+        Map<Long, Integer> groupNumbers = dto.getGroupNumbers();
+        for (Long memberId : groupNumbers.keySet()) {
+            teamRoleService.updateStudyGroupOfTeam(dto.getId(), memberId, groupNumbers.get(memberId));
+        }
+
         // tag update
         tagService.updateTags(studyTeam.getId(), dto.getTags());
         StudyTeam saved = studyTeamRepository.save(studyTeam);
         return makeResponseDto(saved);
     }
 
-    public StudyTeamResponseDto addStudyDetail(StudyDetailCreateDto dto) {
+    public StudyDetailResponseDto addStudyDetail(StudyDetailCreateDto dto) {
         StudyTeam studyTeam = studyTeamRepository.findById(dto.getTeamId()).get();
         StudyDetail saved = studyDetailRepository.save(StudyDetail.builder()
                 .studyTeam(studyTeam)
@@ -139,13 +155,13 @@ public class StudyTeamService {
                     studyRoleRepository.save(studyRole);
                 });
 
-        return makeResponseDto(studyTeam);
+        return makeDetailResponseDto(saved);
     }
 
-    public StudyTeamResponseDto updateStudyDetail(StudyDetailUpdateDto dto) {
-        StudyDetail detail = studyDetailRepository.findById(dto.getDetail_id()).get();
-        detail.setWeek(detail.getWeek());
-        detail.setContent(detail.getContent());
+    public StudyDetailResponseDto updateStudyDetail(StudyDetailUpdateDto dto) {
+        StudyDetail detail = studyDetailRepository.findById(dto.getId()).get();
+        detail.setWeek(dto.getWeek());
+        detail.setContent(dto.getContent());
 
         dto.getAttendances().stream()
                 .forEach(attendance -> {
@@ -159,7 +175,67 @@ public class StudyTeamService {
                 });
 
         StudyDetail saved = studyDetailRepository.save(detail);
-        return makeResponseDto(saved.getStudyTeam());
+        return makeDetailResponseDto(saved);
+    }
+
+    public void deleteStudyTeam(Long teamId) {
+
+        StudyTeam studyTeam = studyTeamRepository.findById(teamId).get();
+
+        List<StudyRole> deleteList = new ArrayList<>();
+        studyTeam.getMemberRoles()
+                .forEach(role -> {
+                    deleteList.add((StudyRole) role);
+                });
+        for (StudyRole role : deleteList) {
+            teamRoleService.deleteRole(role);
+        }
+        // detail 지우기
+        for (StudyDetail detail : studyTeam.getDetails()) {
+            studyDetailRepository.delete(detail);
+        }
+
+        // tag 지워주기
+        tagService.deleteAllTeamTag(teamId);
+        studyTeamRepository.deleteById(teamId);
+    }
+
+    public void deleteStudyDetail(Long detailId) {
+        StudyDetail studyDetail = studyDetailRepository.findById(detailId).get();
+        StudyTeam studyTeam = studyDetail.getStudyTeam();
+        studyTeam.getDetails().remove(studyDetail);
+
+        // 출석 정보 삭제
+        // 그냥 출석 0 처리
+        studyTeam.getMemberRoles().stream()
+                .filter(mr -> mr.getRollName().equals(RoleName.MEMBER.name()))
+                .forEach(mr -> {
+                    StudyRole studyRole = (StudyRole) mr;
+                    List<Boolean> attendanceList = toAttendanceList(studyRole.getAttendance());
+                    attendanceList.set(studyDetail.getWeek() - 1, false);
+                    studyRole.setAttendance(toAttendanceString(attendanceList));
+                    studyRoleRepository.save(studyRole);
+                });
+
+        studyDetailRepository.deleteById(detailId);
+    }
+
+    private StudyDetailResponseDto makeDetailResponseDto(StudyDetail detail) {
+        StudyDetailResponseDto res = mapper.map(detail, StudyDetailResponseDto.class);
+        List<AttendanceResponseDto> attendances = detail.getStudyTeam().getMemberRoles().stream()
+                .filter(mr -> mr.getRollName().equals(RoleName.MEMBER.name()))
+                .map(mr -> {
+                    StudyRole studyRole = (StudyRole) mr;
+                    Boolean isAttend = toAttendanceList(studyRole.getAttendance()).get(detail.getWeek() - 1);
+                    return AttendanceResponseDto.builder()
+                            .isAttend(isAttend)
+                            .memberName(studyRole.getMember().getName())
+                            .groupNumber(studyRole.getGroupNumber())
+                            .build();
+                })
+                .collect(Collectors.toList());
+        res.setAttendances(attendances);
+        return res;
     }
 
     private StudyTeamResponseDto makeResponseDto(StudyTeam studyTeam) {
@@ -169,7 +245,7 @@ public class StudyTeamService {
                     .filter(mr -> mr.getRollName().equals(RoleName.MEMBER.name()))
                     .map(mr -> {
                         StudyRole studyRole = (StudyRole) mr;
-                        Boolean isAttend = toAttendanceList(studyRole.getAttendance()).get(detail.getWeek()-1);
+                        Boolean isAttend = toAttendanceList(studyRole.getAttendance()).get(detail.getWeek() - 1);
                         return AttendanceResponseDto.builder()
                                 .isAttend(isAttend)
                                 .memberName(studyRole.getMember().getName())
@@ -184,7 +260,7 @@ public class StudyTeamService {
     }
 
     private List<Boolean> toAttendanceList(String attendanceString) {
-        if(attendanceString.equals("")) return new ArrayList<>();
+        if (attendanceString.equals("")) return new ArrayList<>();
         return Arrays.stream(attendanceString.split(","))
                 .map(str -> str.equals("1"))
                 .collect(Collectors.toList());

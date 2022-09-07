@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudyDetailUpdateDto {
-    private Long detail_id;
+    private Long id;
     private Integer week;
     private String content;
     private List<AttendanceManageDto> attendances;

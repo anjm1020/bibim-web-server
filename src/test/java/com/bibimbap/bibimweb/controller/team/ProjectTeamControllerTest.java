@@ -51,6 +51,10 @@ public class ProjectTeamControllerTest {
     final String HOR = "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$";
 
     @Test
+    @DisplayName("tmp")
+    void tmp() {
+    }
+    @Test
     @DisplayName("멤버 생성 -> 팀 생성 테스트")
     void createMemberAndTeam() throws Exception {
 

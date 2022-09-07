@@ -6,6 +6,7 @@ import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.domain.team.ProjectTeam;
 import com.bibimbap.bibimweb.domain.team.tag.TeamTag;
 import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
+import com.bibimbap.bibimweb.dto.member.team.MemberTeamResponseDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamCreateDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamResponseDto;
 import com.bibimbap.bibimweb.dto.team.project.ProjectTeamUpdateDto;
@@ -83,13 +84,13 @@ class ProjectTeamServiceTest {
         assertThat(saved.getPeriod()).isEqualTo(LocalDate.now().getYear());
 
         // Member
-        MemberResponseDto leader = saved.getLeader();
+        MemberTeamResponseDto leader = saved.getLeader();
         assertThat(leader.getId()).isEqualTo(memberA.getId());
         assertThat(leader.getName()).isEqualTo(memberA.getName());
 
-        List<MemberResponseDto> members = saved.getMembers();
+        List<MemberTeamResponseDto> members = saved.getMembers();
         assertThat(members.size()).isEqualTo(memberList.size());
-        for (MemberResponseDto member : members) {
+        for (MemberTeamResponseDto member : members) {
             System.out.println(member);
             assertThat(memberList.stream().anyMatch(id -> member.getId() == id)).isTrue();
         }
@@ -116,7 +117,7 @@ class ProjectTeamServiceTest {
         assertThat(leaderRole.getMember().getId()).isEqualTo(leader.getId());
         assertThat(leaderRole.getTeam().getId()).isEqualTo(saved.getId());
 
-        for (MemberResponseDto member : members) {
+        for (MemberTeamResponseDto member : members) {
             Member curr = memberRepository.findById(member.getId()).get();
             List<Role> memberRoles = curr.getRoles();
             assertThat(memberRoles.size()).isEqualTo(1);
@@ -370,7 +371,6 @@ class ProjectTeamServiceTest {
         assertThat(updateRoles.stream()
                 .anyMatch(r -> r.getRollName().equals("MEMBER")
                         && r.getMember().getId() == newMember.getId())).isTrue();
-
     }
 
     @Test

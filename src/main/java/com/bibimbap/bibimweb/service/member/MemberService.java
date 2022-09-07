@@ -2,10 +2,11 @@ package com.bibimbap.bibimweb.service.member;
 
 import com.bibimbap.bibimweb.domain.member.Member;
 import com.bibimbap.bibimweb.dto.member.*;
+import com.bibimbap.bibimweb.dto.member.role.AdminMemberResponseDto;
+import com.bibimbap.bibimweb.dto.member.role.HonorMemberResponseDto;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.AdminRoleRepository;
 import com.bibimbap.bibimweb.repository.role.HonorRoleRepository;
-import com.bibimbap.bibimweb.service.role.MemberRoleService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;

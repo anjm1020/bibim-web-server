@@ -5,6 +5,7 @@ import com.bibimbap.bibimweb.dto.team.study.StudyTeamCreateDto;
 import com.bibimbap.bibimweb.dto.team.study.StudyTeamResponseDto;
 import com.bibimbap.bibimweb.dto.team.study.detail.AttendanceManageDto;
 import com.bibimbap.bibimweb.dto.team.study.detail.StudyDetailCreateDto;
+import com.bibimbap.bibimweb.dto.team.study.detail.StudyDetailResponseDto;
 import com.bibimbap.bibimweb.repository.team.study.StudyTeamRepository;
 import com.bibimbap.bibimweb.service.lib.MemberManager;
 import org.junit.jupiter.api.DisplayName;
@@ -83,7 +84,7 @@ public class StudyTeamServiceTest {
                 .build()));
 
         System.out.println("1주차 활동 추가");
-        StudyTeamResponseDto res = studyTeamService.addStudyDetail(StudyDetailCreateDto.builder()
+        StudyDetailResponseDto res = studyTeamService.addStudyDetail(StudyDetailCreateDto.builder()
                 .teamId(team1.getId())
                 .content("1주차 활동")
                 .week(1)
@@ -98,7 +99,7 @@ public class StudyTeamServiceTest {
                 .build()));
 
         System.out.println("2주차 활동 추가");
-        StudyTeamResponseDto res2 = studyTeamService.addStudyDetail(StudyDetailCreateDto.builder()
+        StudyDetailResponseDto res2 = studyTeamService.addStudyDetail(StudyDetailCreateDto.builder()
                 .teamId(team1.getId())
                 .content("2주차 활동")
                 .week(2)

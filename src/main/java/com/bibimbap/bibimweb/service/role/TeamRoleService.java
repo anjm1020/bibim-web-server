@@ -10,6 +10,8 @@ import com.bibimbap.bibimweb.repository.role.StudyRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class TeamRoleService {
@@ -48,6 +50,17 @@ public class TeamRoleService {
         studyRole.setMember(newMember);
         studyRoleRepository.save(studyRole);
         newMember.getRoles().add(studyRole);
+    }
+
+    public void updateStudyGroupOfTeam(Long teamId, Long memberId, Integer groupNumber) {
+        Optional<StudyRole> optional = studyRoleRepository.findByTeamIdAndRollNameAndMemberId(teamId, RoleName.MEMBER.name(), memberId);
+
+        if (optional.isEmpty()) {
+            return;
+        }
+
+        StudyRole studyRole = optional.get();
+        studyRole.setGroupNumber(groupNumber);
     }
 
     public void deleteRole(ProjectRole projectRole) {

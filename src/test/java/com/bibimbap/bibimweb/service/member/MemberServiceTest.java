@@ -4,6 +4,8 @@ import com.bibimbap.bibimweb.domain.member.Member;
 import com.bibimbap.bibimweb.domain.role.Role;
 import com.bibimbap.bibimweb.domain.role.member.AdminRole;
 import com.bibimbap.bibimweb.dto.member.*;
+import com.bibimbap.bibimweb.dto.member.role.AdminMemberDto;
+import com.bibimbap.bibimweb.dto.member.role.AdminMemberResponseDto;
 import com.bibimbap.bibimweb.repository.member.MemberRepository;
 import com.bibimbap.bibimweb.repository.role.AdminRoleRepository;
 import com.bibimbap.bibimweb.service.lib.MemberManager;

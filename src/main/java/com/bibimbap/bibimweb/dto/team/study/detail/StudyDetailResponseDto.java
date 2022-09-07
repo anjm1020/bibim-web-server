@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class StudyDetailResponseDto {
     private Long id;
+    private Long teamId;
     private String content;
     private Integer week;
     private List<AttendanceResponseDto> attendances;

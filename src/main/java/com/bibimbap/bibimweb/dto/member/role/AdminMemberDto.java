@@ -1,4 +1,4 @@
-package com.bibimbap.bibimweb.dto.member;
+package com.bibimbap.bibimweb.dto.member.role;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HonorMemberDto {
+public class AdminMemberDto {
     private Long memberId;
-    private String groupName;
+    private String position;
 }

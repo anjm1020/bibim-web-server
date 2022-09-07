@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.bibimbap.bibimweb.dto.member.AdminMemberDto;
-import com.bibimbap.bibimweb.dto.member.AdminMemberResponseDto;
+import com.bibimbap.bibimweb.dto.member.role.AdminMemberDto;
+import com.bibimbap.bibimweb.dto.member.role.AdminMemberResponseDto;
 import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
 import com.bibimbap.bibimweb.service.lib.MemberManager;
 import com.bibimbap.bibimweb.service.role.MemberRoleService;

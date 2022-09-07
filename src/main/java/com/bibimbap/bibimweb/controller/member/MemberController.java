@@ -1,6 +1,10 @@
 package com.bibimbap.bibimweb.controller.member;
 
 import com.bibimbap.bibimweb.dto.member.*;
+import com.bibimbap.bibimweb.dto.member.role.AdminMemberDto;
+import com.bibimbap.bibimweb.dto.member.role.AdminMemberResponseDto;
+import com.bibimbap.bibimweb.dto.member.role.HonorMemberDto;
+import com.bibimbap.bibimweb.dto.member.role.HonorMemberResponseDto;
 import com.bibimbap.bibimweb.service.member.MemberService;
 import com.bibimbap.bibimweb.service.role.MemberRoleService;
 import com.bibimbap.bibimweb.util.exception.ConflictException;

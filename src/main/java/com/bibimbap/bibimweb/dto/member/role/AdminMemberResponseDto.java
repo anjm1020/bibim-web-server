@@ -1,5 +1,6 @@
-package com.bibimbap.bibimweb.dto.member;
+package com.bibimbap.bibimweb.dto.member.role;
 
+import com.bibimbap.bibimweb.dto.member.MemberResponseDto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
